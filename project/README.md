@@ -166,3 +166,5 @@ The project will be graded on the following criteria:
 - Creativity
 
 The project will be graded by the instructor and the TAs.  We will look in detail at the commit log of the project, so please make sure to commit often and with meaningful messages, and make sure everybody commits their own code so we can attribute the work correctly.
+
+Testing
