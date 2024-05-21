@@ -1,5 +1,7 @@
 # Project: Bird Watching App
 
+test hi
+
 The goal of the project is to build a bird-watching app/site, loosely modeled on ebird.org.  The project has been chosen in a way that will let us play with many interesting features in web development, including developing responsive one-page apps, maps integration, user communication, and more. 
 
 The project is organized around the following main pages: 
