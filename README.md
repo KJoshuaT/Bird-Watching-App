@@ -1,7 +1,5 @@
 # Project: Bird Watching App
 
-test hi
-
 The goal of the project is to build a bird-watching app/site, loosely modeled on ebird.org.  The project has been chosen in a way that will let us play with many interesting features in web development, including developing responsive one-page apps, maps integration, user communication, and more. 
 
 The project is organized around the following main pages: 
@@ -11,7 +9,7 @@ The project is organized around the following main pages:
 - Stats page.  Enables users to see stats and compilations about their own data. 
 - Location page.  Enables users to ask for details about a birding location. 
 
-There can of course be auxiliary management pages built.  The four pages above should be developed in vue.js.  You can, for instance, assign one group member to develop each page. 
+There can of course be auxiliary management pages built.  The four pages above should be developed in vue.js.  You can, for instance, assign one group member to develop each page.
 
 ## Index page
 

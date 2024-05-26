@@ -30,6 +30,8 @@ from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
 from py4web.utils.url_signer import URLSigner
 from .models import get_user_email
+from py4web.utils.form import Form, FormStyleBulma
+from py4web.utils.grid import Grid, GridClassStyleBulma
 
 url_signer = URLSigner(session)
 
@@ -46,3 +48,15 @@ def index():
 def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
     return dict(my_value=3)
+
+@action('checklist/<path:path>', method=['POST', 'GET'])  
+@action('checklist', method=['POST', 'GET'])
+@action.uses('checklist.html', db, auth)
+def checklist(path = None):
+    grid = Grid(path,
+                formstyle= FormStyleBulma,
+                grid_class_style=GridClassStyleBulma,
+                query = (db.checklist.checklist_id > 0),
+                orderby = [~db.checklist.created_on],
+                )
+    return dict(grid=grid)
