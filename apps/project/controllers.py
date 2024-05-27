@@ -60,3 +60,9 @@ def checklist(path = None):
                 orderby = [~db.checklist.created_on],
                 )
     return dict(grid=grid)
+
+@action('location/<path:path>',method=['POST','GET'])
+@action('location',method=['POST','GET'])
+@action.uses('location.html',db,auth)
+def location(path=None):
+    return dict()
