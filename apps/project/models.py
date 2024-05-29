@@ -19,6 +19,8 @@ def get_time():
 #
 ## always commit your models to avoid problems later
 
+names_to_id = {}
+
 # Species table
 db.define_table('species',
     Field('name', 'string', requires=[IS_NOT_EMPTY(), IS_NOT_IN_DB(db, 'species.name')]),
@@ -34,10 +36,19 @@ db.define_table('checklist',
 
 # Sightings table
 db.define_table('sighting',
-    Field('checklist_id', 'reference checklist'),
-    Field('species_id', 'reference species'),
+    Field('checklist_id', 'string', requires=[IS_NOT_EMPTY(), IS_IN_DB(db, 'checklist.checklist_id', '%(checklist_id)s')]),
+    Field('species_name', 'string', requires=[IS_NOT_EMPTY(), IS_IN_DB(db, 'species.name', '%(name)s')]),
     Field('number_seen', 'integer', default=1, requires=IS_INT_IN_RANGE(1, None))
 )
+
+if db(db.species).isempty():
+    with open("apps/project/species.csv") as f:
+        csv_reader = csv.reader(f)
+        next(csv_reader) # Skip the header
+        for row in csv_reader:
+            id = db.species.insert(name=row[0])
+            names_to_id[row[0]] = id
+            # ? names_to_id helps with lookup according to prof, forgot why and how to use tho lol
 
 if db(db.checklist).isempty():
     with open("apps/project/checklists.csv") as f:
@@ -51,6 +62,19 @@ if db(db.checklist).isempty():
                 location= json.dumps({'latitude': row[1], 'longitude': row[2]}),
                 created_on= datetime.datetime.strptime(f"{row[3]} {row[4]}", '%Y-%m-%d %H:%M:%S'),
                 user_id= row[5],
+            )
+            
+if db(db.sighting).isempty():
+    with open("apps/project/sightings.csv") as f:
+        csv_reader = csv.reader(f)
+        next(csv_reader) # Skip the header
+        for row in csv_reader:
+            if row[2] == 'X':
+              row[2] = 1
+            db.sighting.insert(
+                checklist_id=row[0],
+                species_name=row[1],
+                number_seen=row[2],
             )
 
 db.commit()
