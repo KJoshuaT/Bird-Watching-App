@@ -56,7 +56,7 @@ def checklist(path = None):
     grid = Grid(path,
                 formstyle= FormStyleBulma,
                 grid_class_style=GridClassStyleBulma,
-                query = (db.sighting.checklist_id > 0)
+                query = (db.sighting.event_id > 0)
                 )
     return dict(grid=grid)
 
