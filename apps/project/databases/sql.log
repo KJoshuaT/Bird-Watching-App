@@ -1,4 +1,4 @@
-timestamp: 2024-05-28T20:38:15.625025
+timestamp: 2024-05-30T17:25:13.787195
 CREATE TABLE "py4web_session"(
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "rkey" CHAR(512),
@@ -8,7 +8,7 @@ CREATE TABLE "py4web_session"(
     "expires_on" TIMESTAMP
 );
 success!
-timestamp: 2024-05-28T20:38:15.642578
+timestamp: 2024-05-30T17:25:13.805945
 CREATE TABLE "auth_user"(
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "email" CHAR(512) UNIQUE,
@@ -21,138 +21,33 @@ CREATE TABLE "auth_user"(
     "past_passwords_hash" TEXT
 );
 success!
-timestamp: 2024-05-28T20:38:15.659210
+timestamp: 2024-05-30T17:25:13.820407
 CREATE TABLE "auth_user_tag_groups"(
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "tagpath" CHAR(512),
     "record_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
 );
 success!
-DROP TABLE "py4web_session";
-success!
-DROP TABLE "auth_user_tag_groups";
-success!
-timestamp: 2024-05-28T20:38:15.697611
+timestamp: 2024-05-30T17:25:13.836571
 CREATE TABLE "species"(
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "name" CHAR(512)
 );
 success!
-timestamp: 2024-05-28T20:38:15.709828
+timestamp: 2024-05-30T17:25:13.851330
 CREATE TABLE "checklist"(
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "checklist_id" CHAR(512) UNIQUE,
+    "event_id" CHAR(512) UNIQUE,
     "location" TEXT,
     "created_on" TIMESTAMP,
     "user_id" CHAR(512)
 );
 success!
-timestamp: 2024-05-28T20:38:15.726117
+timestamp: 2024-05-30T17:25:13.865722
 CREATE TABLE "sighting"(
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "checklist_id" CHAR(512),
-    "species_name" CHAR(512),
+    "event_id" CHAR(512),
+    "species_id" INTEGER REFERENCES "species" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
     "number_seen" INTEGER
-);
-success!
-timestamp: 2024-05-28T20:38:42.699414
-CREATE TABLE "py4web_session"(
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "rkey" CHAR(512),
-    "rvalue" TEXT,
-    "expiration" INTEGER,
-    "created_on" TIMESTAMP,
-    "expires_on" TIMESTAMP
-);
-success!
-timestamp: 2024-05-28T20:38:42.719912
-CREATE TABLE "auth_user_tag_groups"(
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "tagpath" CHAR(512),
-    "record_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
-);
-success!
-DROP TABLE "py4web_session";
-success!
-DROP TABLE "auth_user_tag_groups";
-success!
-timestamp: 2024-05-28T20:39:27.641073
-CREATE TABLE "py4web_session"(
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "rkey" CHAR(512),
-    "rvalue" TEXT,
-    "expiration" INTEGER,
-    "created_on" TIMESTAMP,
-    "expires_on" TIMESTAMP
-);
-success!
-timestamp: 2024-05-28T20:39:27.670975
-CREATE TABLE "auth_user_tag_groups"(
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "tagpath" CHAR(512),
-    "record_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
-);
-success!
-DROP TABLE "py4web_session";
-success!
-DROP TABLE "auth_user_tag_groups";
-success!
-timestamp: 2024-05-28T20:40:16.569578
-CREATE TABLE "py4web_session"(
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "rkey" CHAR(512),
-    "rvalue" TEXT,
-    "expiration" INTEGER,
-    "created_on" TIMESTAMP,
-    "expires_on" TIMESTAMP
-);
-success!
-timestamp: 2024-05-28T20:40:16.587983
-CREATE TABLE "auth_user_tag_groups"(
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "tagpath" CHAR(512),
-    "record_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
-);
-success!
-DROP TABLE "py4web_session";
-success!
-DROP TABLE "auth_user_tag_groups";
-success!
-timestamp: 2024-05-28T20:41:10.847393
-CREATE TABLE "py4web_session"(
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "rkey" CHAR(512),
-    "rvalue" TEXT,
-    "expiration" INTEGER,
-    "created_on" TIMESTAMP,
-    "expires_on" TIMESTAMP
-);
-success!
-timestamp: 2024-05-28T20:41:10.860609
-CREATE TABLE "auth_user_tag_groups"(
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "tagpath" CHAR(512),
-    "record_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
-);
-success!
-DROP TABLE "py4web_session";
-success!
-DROP TABLE "auth_user_tag_groups";
-success!
-timestamp: 2024-05-28T20:42:21.045513
-CREATE TABLE "py4web_session"(
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "rkey" CHAR(512),
-    "rvalue" TEXT,
-    "expiration" INTEGER,
-    "created_on" TIMESTAMP,
-    "expires_on" TIMESTAMP
-);
-success!
-timestamp: 2024-05-28T20:42:21.064171
-CREATE TABLE "auth_user_tag_groups"(
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "tagpath" CHAR(512),
-    "record_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
 );
 success!
