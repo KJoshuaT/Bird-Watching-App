@@ -30,6 +30,7 @@ db.define_table('checklist',
     Field('location', 'json', requires=IS_NOT_EMPTY()),
     Field('created_on', 'datetime', default=get_time),
     Field('user_id', default=get_user_email),
+    Field('content', 'json', default={}),
 )
 
 # Sightings table

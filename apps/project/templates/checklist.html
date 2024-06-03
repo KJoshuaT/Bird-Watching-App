@@ -1,15 +1,24 @@
 [[extend 'layout.html']]
 
 <style>
-[v-cloak] {
-     display: none;
-}
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+  }
+
+  .leaflet-container {
+    height: 400px;
+    width: 600px;
+    max-width: 100%;
+    max-height: 100%;
+  }
 </style>
 
 
 <div class="section" id="app" v-cloak>
   <!-- Put here your Vue.js template -->
-  <h1 class="title"><i class="fa-solid fa-cube"></i> Checklist</h1>
+  <h1 class="title"></i>My Checklists</h1>
   [[=grid.render()]]
 </div>
 
@@ -18,5 +27,5 @@
 <!-- Loads the index-specific js for Vue -->
 <script>
 </script>
-<script src="js/index.js"></script>
+
 [[end]]
