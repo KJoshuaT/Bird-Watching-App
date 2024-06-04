@@ -1,12 +1,10 @@
 [[extend 'layout.html']]
 
 <style>
-  html,
-  body {
+  html, body {
     height: 100%;
     margin: 0;
   }
-
   .leaflet-container {
     height: 400px;
     width: 600px;
@@ -15,6 +13,8 @@
   }
 </style>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" crossorigin=""/>
 <div class="section" id="app" v-cloak>
   <!-- Put here your Vue.js template -->
   <h1 class="title"><i class="fa-solid fa-cube"></i> Title</h1>
@@ -27,9 +27,7 @@
 <script>
   let my_callback_url = "[[=XML(my_callback_url)]]";
 </script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" crossorigin=""></script>
 <script src="js/index.js"></script>
 [[end]]

@@ -7,54 +7,48 @@ let app = {};
 app.data = {
     data: function() {
         return {
-            // Complete as you see fit.
-            my_value: 1, // This is an example.
-            drawing: false, // Indicates whether we are currently drawing a rectangle
-            rectangle: null, // Holds the rectangle being drawn
-            initialLatLng: null // The starting point of the rectangle
+            my_value: 1, // Example data
+            map: null,
+            drawnItems: null
         };
     },
     methods: {
-        // Complete as you see fit.
         my_function: function() {
-            // This is an example.
             this.my_value += 1;
         },
         initMap: function() {
-            // Initialize the map
-            this.map = L.map('map', {
-                center: [51.505, -0.09],
-                zoom: 13,
-                doubleClickZoom: false // Disable double-click zoom
+            var map = L.map('map').setView([51.505, -0.09], 13);
+            L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            // FeatureGroup is to store editable layers
+            var drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+            var drawControl = new L.Control.Draw({
+                draw: {
+                    polygon: false,
+                    marker: false,
+                    circle: false,
+                    circlemarker: false,
+                    polyline: false
+                },  
+                edit: {
+                    featureGroup: drawnItems
+                }
+            });
+            map.addControl(drawControl);
+
+            // Listen for draw:created event to add the created layer to the drawnItems
+            map.on('draw:created', (event) => {
+                var layer = event.layer;
+                drawnItems.addLayer(layer); // Add the layer to the feature group
             });
 
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            }).addTo(this.map);
-
-            // Adds listener for clicks
-            this.map.on('click', this.click_listener);
-            this.map.on('dblclick', this.dblclick_listener);
-        },
-        click_listener: function(e) {
-            // If drawing, update the rectangle
-            if (this.drawing && this.rectangle) {
-                this.rectangle.setBounds([this.initialLatLng, e.latlng]);
-                this.drawing = false; // End drawing on the second click
-            }
-        },
-        dblclick_listener: function(e) {
-            // Start a new rectangle
-            if (this.rectangle) {
-                this.map.removeLayer(this.rectangle);
-            }
-            this.initialLatLng = e.latlng;
-            this.rectangle = L.rectangle([e.latlng, e.latlng], {color: 'red'}).addTo(this.map);
-            this.drawing = true; // Start drawing
+            this.map = map; // Save to Vue instance
         }
     },
     mounted: function() {
+        // Initialize the map when the component is mounted
         this.initMap();
     }
 };
