@@ -4,12 +4,26 @@
   <!-- Put here your Vue.js template -->
   <div class= "container">
     <h1 class="title"></i>Sample Checklist</h1>
-    <div class="field">
-      <label class="label">Search</label>
-      <div class="control">
-        <input class="input" type="text" v-model="searchQuery" placeholder="Search for species...">
+  <div class="columns mb-4">
+      <div class="column is-10">
+        <div class="field">
+          <label class="label">Species Search</label>
+          <div class="control">
+            <input class="input" type="text" v-model="searchQuery">
+          </div>
+        </div>
+      </div>
+      <div class="column is-4">
+        <div class="field">
+          <label class="label">&nbsp;</label> <!-- Empty label for alignment -->
+          <div class="control">
+            <button class="button is-primary" @click="currentPage++">Save Checklist</button>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
+  <div class= "container">
     <div class="table">
       <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
         <thead>
@@ -25,7 +39,6 @@
           </tr>
         </tbody>
       </table>
-    </div>
     <nav class="pagination" role="navigation" aria-label="pagination">
       <ul class="pagination-list">
         <li v-for="page in totalPages" :key="page">
@@ -33,6 +46,7 @@
         </li>
       </ul>
     </nav>
+  </div>
   </div>
 </div>
 

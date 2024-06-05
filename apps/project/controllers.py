@@ -50,20 +50,31 @@ def checklist():
     return dict(
         my_callback_url = URL('my_callback', signer=url_signer),
         load_data_url = URL('load_data', signer=url_signer),
+        save_checklist_url = URL('save_checklist', signer=url_signer),
     )
+
+@action('load_data', method="GET")
+@action.uses(db, auth)
+def load_data():
+    species_list = db(db.species).select().as_list()
+    return dict(species = species_list)
+
+@action('save_checklist', method="POST")
+@action.uses(db, auth)
+def save_checklist():
+    id = db.checklist.insert(
+        location = {},
+        content = request.json.get('content')
+    )
+    cl = db(db.checklist.id == id).select().first()
+    cl.update_record(event_id = str(id))
+    return dict(id=id)
 
 @action('my_callback')
 @action.uses() # Add here things like db, auth, etc.
 def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
     return dict(my_value=3)
-
-@action('load_data', method="GET")
-@action.uses()
-def load_data():
-    # Complete.
-    species_list = db(db.species).select().as_list()
-    return dict(species = species_list)
 
 @action('location/<path:path>',method=['POST','GET'])
 @action('location',method=['POST','GET'])

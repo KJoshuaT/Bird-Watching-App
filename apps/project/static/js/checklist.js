@@ -18,6 +18,7 @@ app.data = {
   },
   computed: {
     filteredSpecies: function () {
+      this.currentPage = 1;
       let searchQuery = this.searchQuery.toLowerCase();
       return this.species.filter(function (species) {
         let name = species.name.toLowerCase();
@@ -43,7 +44,21 @@ app.data = {
     },
     goToPage(page){
       this.currentPage = page;
-    }
+    },
+    saveChecklist: function () {
+      let checklist = {};
+      for (let i = 0; i < this.species.length; i++) {
+        let s = this.species[i];
+        if (s.count > 0) {
+          checklist[s.name] = s.count;
+        }
+      }
+      axios.post(save_checklist_url, {
+        checklist: checklist
+      }).then((response) => {
+        console.log(response.data);
+      });
+    },
   }
 };
 
