@@ -18,7 +18,7 @@ app.data = {
 
 app.vue = Vue.createApp(app.data).mount("#app");
 
-app.drawMap = function(world,width,height,map) {
+app.drawMap = function(world,data,width,height,map) {
   var projection = d3.geoMercator()
     .scale(300)
     .translate([width/2,height/1.5]);
@@ -27,7 +27,16 @@ app.drawMap = function(world,width,height,map) {
 
   var features = world.features;
 
-  console.log(features);
+  console.log(data);
+
+  var count_id = {};
+  
+  data.forEach(function(d){
+    count_id[d.address.admin1] = {
+
+    }
+
+  });
 
   map.append('g')
     .selectAll('path')
@@ -41,11 +50,6 @@ app.load_data = function () {
 
   var width = Math.max(document.getElementById('app').clientWidth, window.innerWidth || 0),
     height = Math.max(document.getElementById('app').clientHeight, window.innerHeight || 0);
-
-
-  axios.get(location_data).then(function(r) {
-    console.log(r);
-  });
 
   const svg = d3.select("#app")
     .append("svg")
@@ -65,8 +69,9 @@ app.load_data = function () {
   var map = svg.append('g')
     .attr('class','map');
 
-    d3.json("topojson/ne_110m_admin_1_states_provinces.geojson").then(function(world) {
-      app.drawMap(world,width,height,map);
+  Promise.all([d3.json("topojson/ne_110m_admin_1_states_provinces.geojson"),
+              axios.get(location_data)]).then(function(world) {
+    app.drawMap(world[0],world[1],width,height,map);
     });
 
 }
