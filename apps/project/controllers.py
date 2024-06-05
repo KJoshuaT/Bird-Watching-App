@@ -33,6 +33,8 @@ from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma
 from .helpers import GridActionButton
+import json
+from .geocode import *
 
 url_signer = URLSigner(session)
 
@@ -78,9 +80,9 @@ def my_callback():
 
 @action('location/<path:path>',method=['POST','GET'])
 @action('location',method=['POST','GET'])
-@action.uses('location.html',db,auth)
+@action.uses('location.html',db,auth,url_signer)
 def location(path=None):
-    return dict(location_data =  URL('get_location_data'))
+    return dict(location_data =  URL('get_location_data',signer=url_signer))
 
 
 @action('get_location_data',method=['GET'])
@@ -97,6 +99,6 @@ def location_data():
     address = get_country(coord_list)
 
     for i,j in zip(checklist_list,address):
-        i['cc'] = j['cc']
+        i['address'] = j
 
     return dict(data = checklist_list)
