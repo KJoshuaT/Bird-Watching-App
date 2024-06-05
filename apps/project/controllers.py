@@ -65,7 +65,6 @@ def load_data():
     species_list = db(db.species).select().as_list()
     return dict(species = species_list)
 
-
 @action('location/<path:path>',method=['POST','GET'])
 @action('location',method=['POST','GET'])
 @action.uses('location.html',db,auth)

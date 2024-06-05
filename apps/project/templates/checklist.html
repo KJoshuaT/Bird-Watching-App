@@ -2,8 +2,14 @@
 
 <div class="section" id="app" v-cloak>
   <!-- Put here your Vue.js template -->
-  <h1 class="title"></i>My Checklists</h1>
   <div class= "container">
+    <h1 class="title"></i>Sample Checklist</h1>
+    <div class="field">
+      <label class="label">Search</label>
+      <div class="control">
+        <input class="input" type="text" v-model="searchQuery" placeholder="Search for species...">
+      </div>
+    </div>
     <div class="table">
       <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
         <thead>
@@ -13,13 +19,20 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="s in species">
+          <tr v-for="s in paginatedSpecies">
             <td>{{ s.name }}</td>
-            <td><input class="input" type="number" placeholder="0"></td>
+            <td><input class="input" type="number" v-model=s.count min= "0"></td>
           </tr>
         </tbody>
       </table>
     </div>
+    <nav class="pagination" role="navigation" aria-label="pagination">
+      <ul class="pagination-list">
+        <li v-for="page in totalPages" :key="page">
+          <a class="pagination-link" :class="{'is-current': currentPage === page}" @click="goToPage(page)">{{ page }}</a>
+        </li>
+      </ul>
+    </nav>
   </div>
 </div>
 
