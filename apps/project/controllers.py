@@ -65,4 +65,23 @@ def checklist(path = None):
 @action('location',method=['POST','GET'])
 @action.uses('location.html',db,auth)
 def location(path=None):
-    return dict()
+    return dict(location_data =  URL('get_location_data'))
+
+
+@action('get_location_data',method=['GET'])
+def location_data():
+    checklist_list = db(db.checklist).select().as_list()
+    coord_list = []
+    for i in checklist_list:
+        data = json.loads(i['location'])
+        lat = float(data['latitude'])
+        long = float(data['longitude'])
+        coordinate = (lat,long)
+        coord_list.append(coordinate)
+    
+    address = get_country(coord_list)
+
+    for i,j in zip(checklist_list,address):
+        i['cc'] = j['cc']
+
+    return dict(data = checklist_list)
