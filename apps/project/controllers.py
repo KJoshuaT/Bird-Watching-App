@@ -71,3 +71,21 @@ def load_data():
 @action.uses('location.html',db,auth)
 def location(path=None):
     return dict()
+
+@action('sightings/<path:path>',method=['POST','GET'])
+@action('sightings',method=['POST','GET'])
+@action.uses('sightings.html',db,auth)
+def sightings(path=None):
+    return dict()
+
+@action('species/<path:path>',method=['GET','POST'])
+@action('species',method=['GET','POST'])
+@action.uses('species.html',db,auth)
+def species(path=None):
+    return dict()
+
+@action('stats/<path:path>',method=['GET','POST']))
+@action('stats',method=['GET','POST'])
+@action.uses('stats.html',db,auth)
+def stats(path=None):
+    return dict()
