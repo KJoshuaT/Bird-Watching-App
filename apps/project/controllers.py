@@ -84,7 +84,7 @@ def sightings(path=None):
 def species(path=None):
     return dict()
 
-@action('stats/<path:path>',method=['GET','POST']))
+@action('stats/<path:path>',method=['GET','POST'])
 @action('stats',method=['GET','POST'])
 @action.uses('stats.html',db,auth)
 def stats(path=None):
