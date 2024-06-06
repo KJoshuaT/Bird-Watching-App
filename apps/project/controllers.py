@@ -31,7 +31,7 @@ from .common import db, session, T, cache, auth, logger, authenticated, unauthen
 from py4web.utils.url_signer import URLSigner
 from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
-from py4web.utils.grid import Grid, GridClassStyleBulma
+from py4web.utils.grid import Grid, GridClassStyleBulma, Column
 from .helpers import GridActionButton
 import json
 from .geocode import *
@@ -56,13 +56,29 @@ def checklist():
         save_checklist_url = URL('save_checklist', signer=url_signer),
     )
     
-@action('my_checklists')
+@action('my_checklists/<path:path>', method=['POST','GET'])
+@action('my_checklists', method=['POST','GET'])
 @action.uses('my_checklists.html', db, auth, url_signer)
-def my_checklists():
+def my_checklists(path = None):
+    columns = [
+        db.checklist.event_id,
+        db.checklist.created_on
+        ]
+    grid = Grid(path,
+                formstyle= FormStyleBulma,
+                grid_class_style=GridClassStyleBulma,
+                columns=columns,
+                query = (db.checklist.user_id == get_user_email),
+                create=False,
+                details=False,
+                editable=False,
+                headings = ['Checklist ID', 'Created On']
+                )
     return dict(
-        my_callback_url = URL('my_callback', signer=url_signer),
-        load_data_url = URL('load_data', signer=url_signer),
-    )
+            grid = grid,
+            my_callback_url = URL('my_callback', signer=url_signer),
+            load_data_url = URL('load_data', signer=url_signer),
+            save_checklist_url = URL('save_checklist', signer=url_signer))
 
 @action('load_data', method="GET")
 @action.uses(db, auth)
