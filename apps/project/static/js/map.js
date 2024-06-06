@@ -27,16 +27,24 @@ app.drawMap = function(world,data,width,height,map) {
 
   var features = world.features;
 
-  console.log(data);
+  var checkList = data.data.data;
 
   var count_id = {};
-  
-  data.forEach(function(d){
-    count_id[d.address.admin1] = {
 
+  checkList.forEach(function(d) {
+    let state = d.address.admin1;
+    if (state in count_id === false) {
+      count_id[state] = {
+        count: 1,
+        birdList: [d]
+      }
+    }else{
+      count_id[state].count += 1;
+      count_id[state].birdList.push(d);
     }
-
   });
+
+  console.log(count_id);
 
   map.append('g')
     .selectAll('path')
@@ -69,7 +77,7 @@ app.load_data = function () {
   var map = svg.append('g')
     .attr('class','map');
 
-  Promise.all([d3.json("topojson/ne_110m_admin_1_states_provinces.geojson"),
+  Promise.all([d3.json("topojson/10m_admin1.geojson"),
               axios.get(location_data)]).then(function(world) {
     app.drawMap(world[0],world[1],width,height,map);
     });
