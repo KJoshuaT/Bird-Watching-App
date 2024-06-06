@@ -36,6 +36,7 @@ from .helpers import GridActionButton
 import json
 from .geocode import *
 
+
 url_signer = URLSigner(session)
 
 @action('index')
@@ -54,23 +55,33 @@ def checklist():
         load_data_url = URL('load_data', signer=url_signer),
         save_checklist_url = URL('save_checklist', signer=url_signer),
     )
+    
+@action('my_checklists')
+@action.uses('my_checklists.html', db, auth, url_signer)
+def my_checklists():
+    return dict(
+        my_callback_url = URL('my_callback', signer=url_signer),
+        load_data_url = URL('load_data', signer=url_signer),
+    )
 
 @action('load_data', method="GET")
 @action.uses(db, auth)
 def load_data():
     species_list = db(db.species).select().as_list()
-    return dict(species = species_list)
+    checklist_list = db(db.checklist).select().as_list()
+    return dict(species = species_list, checklists = checklist_list)
 
 @action('save_checklist', method="POST")
 @action.uses(db, auth)
 def save_checklist():
     id = db.checklist.insert(
         location = {},
-        content = request.json.get('content')
+        content = request.json.get('checklist')
     )
     cl = db(db.checklist.id == id).select().first()
     cl.update_record(event_id = str(id))
-    return dict(id=id)
+    user_lists = db(db.checklist.user_id == get_user_email).select().as_list()
+    return dict(id=id, user_lists = user_lists)
 
 @action('my_callback')
 @action.uses() # Add here things like db, auth, etc.

@@ -5,7 +5,7 @@
   <div class= "container">
     <h1 class="title"></i>Sample Checklist</h1>
   <div class="columns mb-4">
-      <div class="column is-10">
+      <div class="column is-three-quarters">
         <div class="field">
           <label class="label">Species Search</label>
           <div class="control">
@@ -13,11 +13,19 @@
           </div>
         </div>
       </div>
-      <div class="column is-4">
+      <div class="column">
         <div class="field">
           <label class="label">&nbsp;</label> <!-- Empty label for alignment -->
           <div class="control">
-            <button class="button is-primary" @click="currentPage++">Save Checklist</button>
+            <button class="button is-primary" @click="saveChecklist">Save Checklist</button>
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="field">
+          <label class="label">&nbsp;</label> <!-- Empty label for alignment -->
+          <div class="control"> 
+            <a class="button is-link" href="[[=URL('my_checklists')]]">View My Checklist</a>
           </div>
         </div>
       </div>
@@ -56,6 +64,7 @@
 <script>
   let my_callback_url = "[[=XML(my_callback_url)]]";
   let load_data_url = "[[=XML(load_data_url)]]";
+  let save_checklist_url = "[[=XML(save_checklist_url)]]";
 </script>
 
 <script src="js/checklist.js"></script>
