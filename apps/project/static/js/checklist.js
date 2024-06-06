@@ -14,6 +14,8 @@ app.data = {
       searchQuery: '',
       currentPage: 1,
       itemsPerPage: 16,
+      editing: false,
+      checklist_id: "new"
     };
   },
   computed: {
@@ -53,11 +55,19 @@ app.data = {
           checklist[s.name] = s.count;
         }
       }
-      axios.post(save_checklist_url, {
-        checklist: checklist
-      }).then((response) => {
-        console.log(response.data);
-      });
+      if (this.editing) {
+        axios.post(update_checklist_url, {
+          checklist: checklist,
+          event_id: this.checklist_id
+        })
+      }
+      else{
+        axios.post(save_checklist_url, {
+          checklist: checklist
+        }).then((response) => {
+          console.log(response.data);
+        });
+      }
     },
   }
 };
@@ -73,6 +83,21 @@ app.load_data = function () {
     for (let i = 0; i < app.vue.species.length; i++) {
       let species = app.vue.species[i];
       species.count = 0;
+    }
+    if (checklist_id !== 'new') {
+      app.vue.editing = true;
+      app.vue.checklist_id = checklist_id;
+      axios.post(get_checklist_url, {
+        event_id: checklist_id
+      }).then((response) => {
+        let content = response.data.checklist;
+        for (let key in content) {
+          let species = app.vue.species.find(s => s.name === key);
+          if (species) {
+            species.count = content[key];
+          }
+        }
+      });
     }
   });
 }
