@@ -33,6 +33,9 @@ from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma
 from .helpers import GridActionButton
+from pydal.validators import IS_NOT_EMPTY
+import json
+
 
 url_signer = URLSigner(session)
 
@@ -86,5 +89,24 @@ def species(path=None):
 @action('stats/<path:path>',method=['GET','POST'])
 @action('stats',method=['GET','POST'])
 @action.uses('stats.html',db,auth)
-def stats(path=None):
-    return dict()
+def stats():
+    user_email = auth.current_user.get('email') if auth.current_user else None
+    if not user_email:
+        redirect(URL('index'))
+
+    # Retrieve statistics based on the user's data
+    # Example: Count of sightings per species for the logged-in user
+    rows = db(db.sighting.user_id == user_email).select(db.sighting.species_id, db.sighting.number_seen, orderby=db.sighting.species_id)
+    
+    species_sightings = {}
+    for row in rows:
+        species_name = db(db.species.id == row.species_id).select().first().name
+        if species_name in species_sightings:
+            species_sightings[species_name] += row.number_seen
+        else:
+            species_sightings[species_name] = row.number_seen
+
+    # Convert the dictionary to a list of dictionaries for easier handling in the view
+    stats_list = [{'species_name': k, 'number_seen': v} for k, v in species_sightings.items()]
+
+    return dict(stats=stats_list)

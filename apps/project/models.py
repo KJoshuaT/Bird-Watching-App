@@ -37,7 +37,9 @@ db.define_table('checklist',
 db.define_table('sighting',
     Field('event_id', 'string', requires=[IS_NOT_EMPTY(), IS_IN_DB(db, 'checklist.event_id', '%(event_id)s')]),
     Field('species_id', 'reference species', requires=IS_IN_DB(db, 'species.id', '%(name)s')),
-    Field('number_seen', 'integer', default=1, requires=IS_INT_IN_RANGE(1, None))
+    Field('number_seen', 'integer', default=1, requires=IS_INT_IN_RANGE(1, None)),
+    Field('user_id', 'string', default=get_user_email)
+    
 )
 
 names_to_id = {}
@@ -70,11 +72,12 @@ if db(db.sighting).isempty():
         next(csv_reader) # Skip the header
         for row in csv_reader:
             if row[2] == 'X':
-              row[2] = 1
+                row[2] = 1
             db.sighting.insert(
                 event_id=row[0],
                 species_id=names_to_id[row[1]],
                 number_seen=row[2],
             )
+
 
 db.commit()
