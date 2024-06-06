@@ -34,7 +34,7 @@ from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma, Column
 from .helpers import GridActionButton
 import json
-from .geocode import *
+#from .geocode import *
 
 
 url_signer = URLSigner(session)
