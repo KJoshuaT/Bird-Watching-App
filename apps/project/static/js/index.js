@@ -53,21 +53,19 @@ app.data = {
             });
             map.addControl(drawControl);
 
-            // Initialize heatmap layer with adjusted parameters for better visibility
             var heatmap = L.heatLayer([], {
-                radius: 25,  // Larger radius for larger heat points
-                max: 1.0,    // Ensure max intensity is set to default
-                minOpacity: 0.5, // Set the minimum opacity for the heatmap
+                radius: 25,  
+                max: 1.0,  
+                minOpacity: 0.5, 
                 gradient: {1.0: 'blue', 1.0: 'lime', 1.0: 'yellow', 1: 'red'}
 
             }).addTo(map);
-            this.heatmap = heatmap; // Save to Vue instance
+            this.heatmap = heatmap; 
 
-            // Listen for draw:created event to add the created layer to the drawnItems
             map.on('draw:created', (event) => {
                 this.clearDrawnItems(); // Clear existing drawn items
                 var layer = event.layer;
-                drawnItems.addLayer(layer); // Add the layer to the feature group
+                drawnItems.addLayer(layer); 
                 
                 // Save shape information
                 var shapeData = {
@@ -80,7 +78,7 @@ app.data = {
                 console.log('Rectangle data:', shapeData);
             });
 
-            this.map = map; // Save to Vue instance
+            this.map = map; 
 
             this.addSampleHeatData();
         },
