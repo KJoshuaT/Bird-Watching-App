@@ -4,6 +4,7 @@
   <!-- Put here your Vue.js template -->
   <div class= "container">
     <h1 class="title">My Checklists</h1>
+    
     [[=grid.render()]]
   </div>
 </div>
@@ -12,10 +13,6 @@
 [[block page_scripts]]
 <!-- Loads the index-specific js for Vue -->
 <script>
-  let my_callback_url = "[[=XML(my_callback_url)]]";
-  let load_data_url = "[[=XML(load_data_url)]]";
-  let save_checklist_url = "[[=XML(save_checklist_url)]]";
 </script>
 
-<script src="js/checklist.js"></script>
 [[end]]

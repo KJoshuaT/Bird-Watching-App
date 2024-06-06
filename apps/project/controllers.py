@@ -47,13 +47,17 @@ def index():
         my_callback_url = URL('my_callback', signer=url_signer),
     )
 
-@action('checklist')
+@action('checklist/<checklist_id>')
 @action.uses('checklist.html', db, auth, url_signer)
-def checklist():
+def checklist(checklist_id):
+    print(checklist_id)
     return dict(
         my_callback_url = URL('my_callback', signer=url_signer),
         load_data_url = URL('load_data', signer=url_signer),
         save_checklist_url = URL('save_checklist', signer=url_signer),
+        update_checklist_url = URL('update_checklist', signer=url_signer),
+        get_checklist_url = URL('get_checklist', signer=url_signer),
+        checklist_id = checklist_id,
     )
     
 @action('my_checklists/<path:path>', method=['POST','GET'])
@@ -64,14 +68,24 @@ def my_checklists(path = None):
         db.checklist.event_id,
         db.checklist.created_on
         ]
+    post_action_buttons = [
+        lambda row: GridActionButton(
+            url = URL('checklist', row.event_id),
+            text="Edit Checklist",
+            icon="fa-pencil-square-o ",
+            additional_classes="button confirmation is-small",
+    )
+    ]
     grid = Grid(path,
                 formstyle= FormStyleBulma,
                 grid_class_style=GridClassStyleBulma,
                 columns=columns,
                 query = (db.checklist.user_id == get_user_email),
+                orderby = ~db.checklist.created_on,
                 create=False,
                 details=False,
                 editable=False,
+                pre_action_buttons=post_action_buttons,
                 headings = ['Checklist ID', 'Created On']
                 )
     return dict(
@@ -96,8 +110,22 @@ def save_checklist():
     )
     cl = db(db.checklist.id == id).select().first()
     cl.update_record(event_id = str(id))
-    user_lists = db(db.checklist.user_id == get_user_email).select().as_list()
-    return dict(id=id, user_lists = user_lists)
+    return dict(id=id)
+
+@action('update_checklist', method="POST")
+@action.uses(db, auth)
+def update_checklist():
+    event_id = request.json.get('event_id')
+    content = request.json.get('checklist')
+    db(db.checklist.event_id == event_id).update(content = content)
+    return dict()
+
+@action('get_checklist', method="POST")
+@action.uses(db, auth)
+def get_checklist():
+    event_id = request.json.get('event_id')
+    checklist = db(db.checklist.event_id == event_id).select().first()
+    return dict(checklist = checklist.content)
 
 @action('my_callback')
 @action.uses() # Add here things like db, auth, etc.
