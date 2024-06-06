@@ -10,7 +10,20 @@
 
 
 <div class="section" id="app" v-cloak>
-    <h1>checking</h1>
+    <h1>Region Infomation</h1>
+    <div class="card birdlist mt4" v-for="d in datalist" :key="d">
+        <div class="card-content">
+            <div class="media">
+                <div class="media-content">
+                    <p class="species">{{d.species}}</p>
+                </div>
+                <div class="media-left">
+                    <p class="count">{{d.count}}</p>
+                </div>
+            </div>
+        </div>
+    </div> 
+    
 </div>
 
 
