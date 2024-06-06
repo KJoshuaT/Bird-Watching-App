@@ -26,7 +26,7 @@ db.define_table('species',
 
 # Checklist table
 db.define_table('checklist',
-    Field('event_id', 'string', requires=IS_NOT_EMPTY(), unique=True),
+    Field('event_id', 'string', unique=True),
     Field('location', 'json', requires=IS_NOT_EMPTY()),
     Field('created_on', 'datetime', default=get_time),
     Field('user_id', default=get_user_email),

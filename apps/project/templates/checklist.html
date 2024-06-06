@@ -3,13 +3,35 @@
 <div class="section" id="app" v-cloak>
   <!-- Put here your Vue.js template -->
   <div class= "container">
-    <h1 class="title"></i>Sample Checklist</h1>
-    <div class="field">
-      <label class="label">Search</label>
-      <div class="control">
-        <input class="input" type="text" v-model="searchQuery" placeholder="Search for species...">
+    <h1 class="title">Sample Checklist</h1>
+  <div class="columns mb-4">
+      <div class="column is-three-quarters">
+        <div class="field">
+          <label class="label">Species Search</label>
+          <div class="control">
+            <input class="input" type="text" v-model="searchQuery">
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="field">
+          <label class="label">&nbsp;</label> <!-- Empty label for alignment -->
+          <div class="control">
+            <button class="button is-primary" @click="saveChecklist">Save Checklist</button>
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="field">
+          <label class="label">&nbsp;</label> <!-- Empty label for alignment -->
+          <div class="control"> 
+            <a class="button is-link" href="[[=URL('my_checklists')]]">View My Checklist</a>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
+  <div class= "container">
     <div class="table">
       <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
         <thead>
@@ -25,7 +47,6 @@
           </tr>
         </tbody>
       </table>
-    </div>
     <nav class="pagination" role="navigation" aria-label="pagination">
       <ul class="pagination-list">
         <li v-for="page in totalPages" :key="page">
@@ -33,6 +54,7 @@
         </li>
       </ul>
     </nav>
+  </div>
   </div>
 </div>
 
@@ -42,6 +64,10 @@
 <script>
   let my_callback_url = "[[=XML(my_callback_url)]]";
   let load_data_url = "[[=XML(load_data_url)]]";
+  let save_checklist_url = "[[=XML(save_checklist_url)]]";
+  let update_checklist_url = "[[=XML(update_checklist_url)]]";
+  let get_checklist_url = "[[=XML(get_checklist_url)]]";
+  let checklist_id = "[[=(checklist_id)]]";
 </script>
 
 <script src="js/checklist.js"></script>

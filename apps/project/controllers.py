@@ -31,11 +31,8 @@ from .common import db, session, T, cache, auth, logger, authenticated, unauthen
 from py4web.utils.url_signer import URLSigner
 from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
-from py4web.utils.grid import Grid, GridClassStyleBulma
+from py4web.utils.grid import Grid, GridClassStyleBulma, Column
 from .helpers import GridActionButton
-from pydal.validators import IS_NOT_EMPTY
-import json
-
 
 url_signer = URLSigner(session)
 
@@ -47,13 +44,85 @@ def index():
         my_callback_url = URL('my_callback', signer=url_signer),
     )
 
-@action('checklist')
+@action('checklist/<checklist_id>')
 @action.uses('checklist.html', db, auth, url_signer)
-def checklist():
+def checklist(checklist_id):
+    print(checklist_id)
     return dict(
         my_callback_url = URL('my_callback', signer=url_signer),
         load_data_url = URL('load_data', signer=url_signer),
+        save_checklist_url = URL('save_checklist', signer=url_signer),
+        update_checklist_url = URL('update_checklist', signer=url_signer),
+        get_checklist_url = URL('get_checklist', signer=url_signer),
+        checklist_id = checklist_id,
     )
+    
+@action('my_checklists/<path:path>', method=['POST','GET'])
+@action('my_checklists', method=['POST','GET'])
+@action.uses('my_checklists.html', db, auth, url_signer)
+def my_checklists(path = None):
+    columns = [
+        db.checklist.event_id,
+        db.checklist.created_on
+        ]
+    post_action_buttons = [
+        lambda row: GridActionButton(
+            url = URL('checklist', row.event_id),
+            text="Edit Checklist",
+            icon="fa-pencil-square-o ",
+            additional_classes="button confirmation is-small",
+    )
+    ]
+    grid = Grid(path,
+                formstyle= FormStyleBulma,
+                grid_class_style=GridClassStyleBulma,
+                columns=columns,
+                query = (db.checklist.user_id == get_user_email),
+                orderby = ~db.checklist.created_on,
+                create=False,
+                details=False,
+                editable=False,
+                pre_action_buttons=post_action_buttons,
+                headings = ['Checklist ID', 'Created On']
+                )
+    return dict(
+            grid = grid,
+            my_callback_url = URL('my_callback', signer=url_signer),
+            load_data_url = URL('load_data', signer=url_signer),
+            save_checklist_url = URL('save_checklist', signer=url_signer))
+
+@action('load_data', method="GET")
+@action.uses(db, auth)
+def load_data():
+    species_list = db(db.species).select().as_list()
+    checklist_list = db(db.checklist).select().as_list()
+    return dict(species = species_list, checklists = checklist_list)
+
+@action('save_checklist', method="POST")
+@action.uses(db, auth)
+def save_checklist():
+    id = db.checklist.insert(
+        location = {},
+        content = request.json.get('checklist')
+    )
+    cl = db(db.checklist.id == id).select().first()
+    cl.update_record(event_id = str(id))
+    return dict(id=id)
+
+@action('update_checklist', method="POST")
+@action.uses(db, auth)
+def update_checklist():
+    event_id = request.json.get('event_id')
+    content = request.json.get('checklist')
+    db(db.checklist.event_id == event_id).update(content = content)
+    return dict()
+
+@action('get_checklist', method="POST")
+@action.uses(db, auth)
+def get_checklist():
+    event_id = request.json.get('event_id')
+    checklist = db(db.checklist.event_id == event_id).select().first()
+    return dict(checklist = checklist.content)
 
 @action('my_callback')
 @action.uses() # Add here things like db, auth, etc.
@@ -61,16 +130,9 @@ def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
     return dict(my_value=3)
 
-@action('load_data', method="GET")
-@action.uses()
-def load_data():
-    # Complete.
-    species_list = db(db.species).select().as_list()
-    return dict(species = species_list)
-
 @action('location/<path:path>',method=['POST','GET'])
 @action('location',method=['POST','GET'])
-@action.uses('location.html',db,auth)
+@action.uses('location.html',db,auth,url_signer)
 def location(path=None):
     return dict()
 
@@ -89,24 +151,5 @@ def species(path=None):
 @action('stats/<path:path>',method=['GET','POST'])
 @action('stats',method=['GET','POST'])
 @action.uses('stats.html',db,auth)
-def stats():
-    user_email = auth.current_user.get('email') if auth.current_user else None
-    if not user_email:
-        redirect(URL('index'))
-
-    # Retrieve statistics based on the user's data
-    # Example: Count of sightings per species for the logged-in user
-    rows = db(db.sighting.user_id == user_email).select(db.sighting.species_id, db.sighting.number_seen, orderby=db.sighting.species_id)
-    
-    species_sightings = {}
-    for row in rows:
-        species_name = db(db.species.id == row.species_id).select().first().name
-        if species_name in species_sightings:
-            species_sightings[species_name] += row.number_seen
-        else:
-            species_sightings[species_name] = row.number_seen
-
-    # Convert the dictionary to a list of dictionaries for easier handling in the view
-    stats_list = [{'species_name': k, 'number_seen': v} for k, v in species_sightings.items()]
-
-    return dict(stats=stats_list)
+def stats(path=None):
+    return dict()
