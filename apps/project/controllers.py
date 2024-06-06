@@ -34,7 +34,7 @@ from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma, Column
 from .helpers import GridActionButton
 import json
-#from .geocode import *
+from .geocode import *
 
 
 url_signer = URLSigner(session)
@@ -113,19 +113,26 @@ def location(path=None):
 
 
 @action('get_location_data',method=['GET'])
+@action.uses(db,auth)
 def location_data():
-    checklist_list = db(db.checklist).select().as_list()
-    coord_list = []
-    for i in checklist_list:
-        data = json.loads(i['location'])
-        lat = float(data['latitude'])
-        long = float(data['longitude'])
-        coordinate = (lat,long)
-        coord_list.append(coordinate)
-    
-    address = get_country(coord_list)
+    checklist_list = db(db.checklist.user_id == "obs678631").select()
+    #sighting = db(db.sighting).select().as_list()
+    #species = db(db.species).select().as_list()
 
-    for i,j in zip(checklist_list,address):
-        i['address'] = j
+    combine_table = []
+    for row in checklist_list:
+        event_id = row.event_id
+        sighting_obj = db(db.sighting.event_id == event_id).select().first()
+        if sighting_obj != None:
+            species_tag = sighting_obj.species_id
+            species_obj = db(db.species.id == species_tag).select().first()
+            combine_table.append({
+                "species_name": species_obj.name,
+                "sighting": sighting_obj.number_seen,
+                "content" : row.content,
+                "location" : row.location,
+                "created_on" : row.created_on
 
-    return dict(data = checklist_list)
+            })
+
+    return dict(data = combine_table)
