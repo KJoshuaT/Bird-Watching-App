@@ -4,7 +4,9 @@
   <!-- Put here your Vue.js template -->
   <div class= "container">
     <h1 class="title">My Checklists</h1>
-    
+    <div class="control"> 
+      <a class="button is-link" href="[[=URL('checklist/new')]]">Add New Checklist</a>
+    </div>
     [[=grid.render()]]
   </div>
 </div>
