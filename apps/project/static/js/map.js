@@ -44,14 +44,39 @@ app.drawMap = function(world,data,width,height,map) {
     }
   });
 
-  console.log(count_id);
+  features.forEach(function(d) {
+      d.details = count_id[d.properties.name] ? count_id[d.properties.name] : {};
+  });
 
   map.append('g')
     .selectAll('path')
     .data(features)
     .enter()
     .append('path')
+    .attr('name',function(d) {
+      return d.properties.name
+    })
+    .attr('id',function(d) {
+      return d.id;
+    })
     .attr('d',path)
+    .on('mouseover', function(d) {
+      d3.select(this)
+        .style('stroke','white')
+        .style('stroke-width',1)
+        .style('cursor','pointer');
+
+      let data =d.target.__data__;
+      console.log(data);
+  
+      
+    })
+    .on('mouseout',function(d) {
+      d3.select(this)
+        .style('stroke',null)
+        .style('stroke-width',0.25);
+
+    })
 }
 
 app.load_data = function () {
