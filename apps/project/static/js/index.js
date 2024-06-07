@@ -94,7 +94,30 @@ app.data = {
             for (var i = 0; i < sampleData.length; i++) {
                 this.heatmap.addLatLng([sampleData[i][0], sampleData[i][1], sampleData[i][2]]);
             }
+        },
+        sendShapeDataAndRedirect() {
+            const queryParams = [];
+        
+            for (let i = 0; i < this.shape.latlngs.length; i++) {
+                const coordinateArray = this.shape.latlngs[i];
+                coordinateArray.forEach((coord, index) => {
+                    const { lat, lng } = coord;
+                    const coordinateObject = { lat, lng };
+                    queryParams.push(`${index}=${JSON.stringify(coordinateObject)}`);
+                });
+            }
+
+            const queryString = queryParams.join('&');
+        
+            const url = `/project/location?${queryString}`;
+        
+            console.log(queryString);
+
+            window.location.href = url;
         }
+        
+        
+        
     },
     mounted: function() {
         // Initialize the map when the component is mounted
