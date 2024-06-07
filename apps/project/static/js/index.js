@@ -96,6 +96,10 @@ app.data = {
             }
         },
         sendShapeDataAndRedirectLocation() {
+            if (!this.shape) {
+                alert("Select a region on the map");
+                return;
+            }
             const queryParams = [];
         
             for (let i = 0; i < this.shape.latlngs.length; i++) {
@@ -116,6 +120,10 @@ app.data = {
             window.location.href = url;
         },
         sendShapeDataAndRedirectChecklist() {
+            if (!this.shape) {
+                alert("Select a region on the map");
+                return;
+            }
             const queryParams = [];
         
             for (let i = 0; i < this.shape.latlngs.length; i++) {
@@ -135,9 +143,30 @@ app.data = {
 
             window.location.href = url;
         },
+        sendShapeDataAndRedirectStats() {
+            if (!this.shape) {
+                alert("Select a region on the map");
+                return;
+            }
+            const queryParams = [];
         
+            for (let i = 0; i < this.shape.latlngs.length; i++) {
+                const coordinateArray = this.shape.latlngs[i];
+                coordinateArray.forEach((coord, index) => {
+                    const { lat, lng } = coord;
+                    const coordinateObject = { lat, lng };
+                    queryParams.push(`${index}=${JSON.stringify(coordinateObject)}`);
+                });
+            }
+
+            const queryString = queryParams.join('&');
         
+            const url = `/project/stats?${queryString}`;
         
+            console.log(queryString);
+
+            window.location.href = url;
+        },
     },
     mounted: function() {
         // Initialize the map when the component is mounted
