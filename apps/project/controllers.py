@@ -33,9 +33,6 @@ from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma, Column
 from .helpers import GridActionButton
-import json
-#from .geocode import *
-
 
 url_signer = URLSigner(session)
 
@@ -137,30 +134,22 @@ def my_callback():
 @action('location',method=['POST','GET'])
 @action.uses('location.html',db,auth,url_signer)
 def location(path=None):
-    return dict(location_data =  URL('get_location_data',signer=url_signer))
+    return dict()
 
+@action('sightings/<path:path>',method=['POST','GET'])
+@action('sightings',method=['POST','GET'])
+@action.uses('sightings.html',db,auth)
+def sightings(path=None):
+    return dict()
 
-@action('get_location_data',method=['GET'])
-@action.uses(db,auth)
-def location_data():
-    checklist_list = db(db.checklist.user_id == "obs678631").select()
-    #sighting = db(db.sighting).select().as_list()
-    #species = db(db.species).select().as_list()
+@action('species/<path:path>',method=['GET','POST'])
+@action('species',method=['GET','POST'])
+@action.uses('species.html',db,auth)
+def species(path=None):
+    return dict()
 
-    combine_table = []
-    for row in checklist_list:
-        event_id = row.event_id
-        sighting_obj = db(db.sighting.event_id == event_id).select().first()
-        if sighting_obj != None:
-            species_tag = sighting_obj.species_id
-            species_obj = db(db.species.id == species_tag).select().first()
-            combine_table.append({
-                "species_name": species_obj.name,
-                "sighting": sighting_obj.number_seen,
-                "content" : row.content,
-                "location" : row.location,
-                "created_on" : row.created_on
-
-            })
-
-    return dict(data = combine_table)
+@action('stats/<path:path>',method=['GET','POST'])
+@action('stats',method=['GET','POST'])
+@action.uses('stats.html',db,auth)
+def stats(path=None):
+    return dict()
