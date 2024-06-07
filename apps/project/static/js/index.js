@@ -95,7 +95,7 @@ app.data = {
                 this.heatmap.addLatLng([sampleData[i][0], sampleData[i][1], sampleData[i][2]]);
             }
         },
-        sendShapeDataAndRedirect() {
+        sendShapeDataAndRedirectLocation() {
             const queryParams = [];
         
             for (let i = 0; i < this.shape.latlngs.length; i++) {
@@ -114,7 +114,27 @@ app.data = {
             console.log(queryString);
 
             window.location.href = url;
-        }
+        },
+        sendShapeDataAndRedirectChecklist() {
+            const queryParams = [];
+        
+            for (let i = 0; i < this.shape.latlngs.length; i++) {
+                const coordinateArray = this.shape.latlngs[i];
+                coordinateArray.forEach((coord, index) => {
+                    const { lat, lng } = coord;
+                    const coordinateObject = { lat, lng };
+                    queryParams.push(`${index}=${JSON.stringify(coordinateObject)}`);
+                });
+            }
+
+            const queryString = queryParams.join('&');
+        
+            const url = `/project/checklist/new?${queryString}`;
+        
+            console.log(queryString);
+
+            window.location.href = url;
+        },
         
         
         
