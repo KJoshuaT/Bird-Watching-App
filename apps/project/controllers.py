@@ -33,6 +33,7 @@ from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma, Column
 from .helpers import GridActionButton
+import json
 
 url_signer = URLSigner(session)
 
@@ -49,7 +50,9 @@ def index():
 @action('checklist/<checklist_id>')
 @action.uses('checklist.html', db, auth, url_signer)
 def checklist(checklist_id):
-    print(checklist_id)
+    logged_in = "True"
+    if not auth.get_user():
+        logged_in = "False"
     return dict(
         my_callback_url = URL('my_callback', signer=url_signer),
         load_data_url = URL('load_data', signer=url_signer),
@@ -57,6 +60,7 @@ def checklist(checklist_id):
         update_checklist_url = URL('update_checklist', signer=url_signer),
         get_checklist_url = URL('get_checklist', signer=url_signer),
         checklist_id = checklist_id,
+        logged_in = logged_in
     )
     
 @action('my_checklists/<path:path>', method=['POST','GET'])
@@ -64,6 +68,7 @@ def checklist(checklist_id):
 @action.uses('my_checklists.html', db, auth, url_signer)
 def my_checklists(path = None):
     columns = [
+        db.checklist.name,
         db.checklist.event_id,
         db.checklist.created_on
         ]
@@ -85,7 +90,7 @@ def my_checklists(path = None):
                 details=False,
                 editable=False,
                 pre_action_buttons=post_action_buttons,
-                headings = ['Checklist ID', 'Created On']
+                headings = ['Checklist Title', 'Checklist ID', 'Created On']
                 )
     return dict(
             grid = grid,
@@ -105,7 +110,8 @@ def load_data():
 def save_checklist():
     id = db.checklist.insert(
         location = {},
-        content = request.json.get('checklist')
+        content = request.json.get('checklist'),
+        name = request.json.get('name')
     )
     cl = db(db.checklist.id == id).select().first()
     cl.update_record(event_id = str(id))
@@ -116,7 +122,7 @@ def save_checklist():
 def update_checklist():
     event_id = request.json.get('event_id')
     content = request.json.get('checklist')
-    db(db.checklist.event_id == event_id).update(content = content)
+    db(db.checklist.event_id == event_id).update(content = content, name = request.json.get('name'))
     return dict()
 
 @action('get_checklist', method="POST")
@@ -124,7 +130,8 @@ def update_checklist():
 def get_checklist():
     event_id = request.json.get('event_id')
     checklist = db(db.checklist.event_id == event_id).select().first()
-    return dict(checklist = checklist.content)
+    name = checklist.name
+    return dict(checklist = checklist.content, name = name)
 
 @action('my_callback')
 @action.uses() # Add here things like db, auth, etc.
@@ -136,7 +143,35 @@ def my_callback():
 @action('location',method=['POST','GET'])
 @action.uses('location.html',db,auth,url_signer)
 def location(path=None):
-    return dict()
+    return dict(location_data = URL('location_data'))
+
+@action('location_data',method=['GET','POST'])
+@action.uses(db,auth)
+def get_location_data():
+    maxLat = request.json.get('maxlat')
+    minLat = request.json.get('minlat')
+
+    maxLng = request.json.get('maxlng')
+    minLng = request.json.get('minlng')
+
+    checklist_row = db(db.checklist).select()
+
+    checklist_array = []
+    sighting_array = []
+
+    for r in checklist_row:
+        location = json.loads(r.location)
+        lat = float(location['latitude'])
+        lng = float(location['longitude'])
+        if lat >= minLat and lat <= maxLat and lng >= minLng and lng <= maxLng:
+            sighting_obj = db(db.sighting.event_id == r.event_id).select().first()
+            if sighting_obj != None: 
+                species_obj = db(db.species.id == sighting_obj.species_id).select().first()
+                sighting_obj['species_name'] = species_obj.name
+                sighting_array.append(sighting_obj)
+                checklist_array.append(r)
+
+    return dict(checklist = checklist_array,sighting=sighting_array)
 
 @action('sightings/<path:path>',method=['POST','GET'])
 @action('sightings',method=['POST','GET'])
