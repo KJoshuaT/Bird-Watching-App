@@ -15,7 +15,8 @@ app.data = {
       currentPage: 1,
       itemsPerPage: 16,
       editing: false,
-      checklist_id: "new"
+      checklist_id: "new",
+      checklistName: "Checklist Title"
     };
   },
   computed: {
@@ -58,15 +59,19 @@ app.data = {
       if (this.editing) {
         axios.post(update_checklist_url, {
           checklist: checklist,
-          event_id: this.checklist_id
+          event_id: this.checklist_id,
+          name: this.checklistName
         })
+        alert("Checklist Updated!");
       }
       else{
         axios.post(save_checklist_url, {
-          checklist: checklist
+          checklist: checklist,
+          name: this.checklistName
         }).then((response) => {
           console.log(response.data);
         });
+        alert("Checklist Saved!");
       }
     },
   }
@@ -75,6 +80,10 @@ app.data = {
 app.vue = Vue.createApp(app.data).mount("#app");
 
 app.load_data = function () {
+  if (logged_in === "False") {
+    alert("You must be logged in to create a checklist");
+    window.location.href = "/project/auth/login";
+  }
   axios.get(my_callback_url).then(function (r) {
     app.vue.my_value = r.data.my_value;
   });
@@ -90,6 +99,7 @@ app.load_data = function () {
       axios.post(get_checklist_url, {
         event_id: checklist_id
       }).then((response) => {
+        app.vue.checklistName = response.data.name;
         let content = response.data.checklist;
         for (let key in content) {
           let species = app.vue.species.find(s => s.name === key);

@@ -11,18 +11,43 @@
 
 <div class="section" id="app" v-cloak>
     <h1>Region Infomation</h1>
-    <div class="card birdlist mt4" v-for="d in datalist" :key="d">
-        <div class="card-content">
-            <div class="media">
-                <div class="media-content">
-                    <p class="species">{{d.species}}</p>
-                </div>
-                <div class="media-left">
-                    <p class="count">{{d.count}}</p>
+    <div class="general_infomation">
+        <div class="card checklist_count">
+            <div class="card-content">
+                <div class="card-title">
+                    <h1>Number of Checklist</h1>
+                    <p class="checklist_number">{{num_checklist}}</p>
                 </div>
             </div>
         </div>
-    </div> 
+        <div class="card sighting_count">
+            <div class="card-content">
+                <div class="card-title">
+                    <h1>Total Number of Sighting</h1>
+                    <p class="sighting_number">{{total_sighting}}</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="checklist">
+        <h1>Your Checklist</h1>
+        <div class="card birdlist mt4" v-for="d in datalist" :key="d">
+            <div class="card-content">
+                <div class="media">
+                    <div class="media-content">
+                        <p class="species"></p>
+                    </div>
+                    <div class="media-left">
+                        <p class="count"></p>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div>
+    <div class="region Stat">
+        
+    </div>
     
 </div>
 
@@ -32,7 +57,7 @@
 [[block page_scripts]]
 <!-- Loads the index-specific js for Vue -->
 <script>
-    let location_data = '[[=XML(location_data)]]';
+    let location_data = '[[=XML(location_data)]]'
 </script>
 <script src="js/map.js"></script>
 [[end]]
