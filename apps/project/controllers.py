@@ -33,6 +33,7 @@ from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma, Column
 from .helpers import GridActionButton
+import json
 
 url_signer = URLSigner(session)
 
@@ -140,7 +141,30 @@ def my_callback():
 @action('location',method=['POST','GET'])
 @action.uses('location.html',db,auth,url_signer)
 def location(path=None):
-    return dict()
+    return dict(location_data = URL('location_data'))
+
+@action('location_data',method=['GET','POST'])
+@action.uses(db,auth)
+def get_location_data():
+    maxLat = request.json.get('maxlat')
+    minLat = request.json.get('minlat')
+
+    maxLng = request.json.get('maxlng')
+    minLng = request.json.get('minlng')
+
+    checklist_row = db(db.checklist).select()
+
+    checklist_array = []
+    sighting_array = []
+
+    for r in checklist_row:
+        location = json.loads(r.location)
+        lat = float(location['latitude'])
+        lng = float(location['longitude'])
+        if lat >= minLat and lat <= maxLat and lng >= minLng and lng <= maxLng:
+            return_array.append(r)
+
+    return dict(checklist = checklist_array)
 
 @action('sightings/<path:path>',method=['POST','GET'])
 @action('sightings',method=['POST','GET'])
