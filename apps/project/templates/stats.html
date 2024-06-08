@@ -1,33 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Statistics</title>
-    <!-- Include Vue.js and Axios here -->
-    <script src="https://unpkg.com/vue@next"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <!-- Link to your stats.js file -->
-    <script defer src="path_to_your_js/stats.js"></script>
-</head>
-<body>
-    <div id="stats-app">
-        <h1>User Statistics</h1>
-        <div v-if="loading">Loading statistics...</div>
-        <div v-if="error" class="error">{{ error }}</div>
-        <table v-if="!loading && !error">
-            <thead>
-                <tr>
-                    <th>Species Name</th>
-                    <th>Number Seen</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="stat in stats" :key="stat.species_name">
-                    <td>{{ stat.species_name }}</td>
-                    <td>{{ stat.number_seen }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</body>
-</html>
+[[extend 'layout.html']]
+
+<style>
+[v-cloak] {
+    display: none;
+}
+</style>
+
+<div class="section" id="app" v-cloak>
+  <h1 class="title">Checklist Items</h1>
+  <div class="container">
+    <table class="table is-fullwidth is-striped">
+      <tr class="item-row" v-for="item in checklist_items" :key="item.id">
+        <td>{{ item.name }}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+[[block page_scripts]]
+<script>
+  let get_checklist_url = "[[=XML(get_checklist_url)]]";
+</script>
+<script src="js/checklist.js"></script>
+[[end]]
