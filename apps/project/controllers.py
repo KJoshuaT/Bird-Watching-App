@@ -159,9 +159,14 @@ def get_location_data():
         lat = float(location['latitude'])
         lng = float(location['longitude'])
         if lat >= minLat and lat <= maxLat and lng >= minLng and lng <= maxLng:
-            return_array.append(r)
+            sighting_obj = db(db.sighting.event_id == r.event_id).select().first()
+            if sighting_obj != None: 
+                species_obj = db(db.species.id == sighting_obj.species_id).selec().first()
+                sighting_obj['species_name'] = species_obj.name
+                sighting_array.append(sighting_obj)
+                return_array.append(r)
 
-    return dict(checklist = checklist_array)
+    return dict(checklist = checklist_array,sighting=sighting_array)
 
 @action('sightings/<path:path>',method=['POST','GET'])
 @action('sightings',method=['POST','GET'])
