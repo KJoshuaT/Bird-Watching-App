@@ -33,14 +33,7 @@ from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma, Column
 from .helpers import GridActionButton
-<<<<<<< HEAD
-from pydal.validators import IS_NOT_EMPTY
 import json
-=======
-import json
-#from .geocode import *
->>>>>>> refs/remotes/origin/main
-
 
 url_signer = URLSigner(session)
 
@@ -50,12 +43,17 @@ def index():
     return dict(
         # COMPLETE: return here any signed URLs you need.
         my_callback_url = URL('my_callback', signer=url_signer),
+        get_species_coordinates_url = URL('get_species_coordinates', signer=url_signer),
+        get_all_species_coordinates_url = URL('get_all_species_coordinates', signer=url_signer),
+        get_species_url = URL('get_species', signer=url_signer),
     )
 
 @action('checklist/<checklist_id>')
 @action.uses('checklist.html', db, auth, url_signer)
 def checklist(checklist_id):
-    print(checklist_id)
+    logged_in = "True"
+    if not auth.get_user():
+        logged_in = "False"
     return dict(
         my_callback_url = URL('my_callback', signer=url_signer),
         load_data_url = URL('load_data', signer=url_signer),
@@ -63,6 +61,7 @@ def checklist(checklist_id):
         update_checklist_url = URL('update_checklist', signer=url_signer),
         get_checklist_url = URL('get_checklist', signer=url_signer),
         checklist_id = checklist_id,
+        logged_in = logged_in
     )
     
 @action('my_checklists/<path:path>', method=['POST','GET'])
@@ -70,6 +69,7 @@ def checklist(checklist_id):
 @action.uses('my_checklists.html', db, auth, url_signer)
 def my_checklists(path = None):
     columns = [
+        db.checklist.name,
         db.checklist.event_id,
         db.checklist.created_on
         ]
@@ -91,7 +91,7 @@ def my_checklists(path = None):
                 details=False,
                 editable=False,
                 pre_action_buttons=post_action_buttons,
-                headings = ['Checklist ID', 'Created On']
+                headings = ['Checklist Title', 'Checklist ID', 'Created On']
                 )
     return dict(
             grid = grid,
@@ -111,7 +111,8 @@ def load_data():
 def save_checklist():
     id = db.checklist.insert(
         location = {},
-        content = request.json.get('checklist')
+        content = request.json.get('checklist'),
+        name = request.json.get('name')
     )
     cl = db(db.checklist.id == id).select().first()
     cl.update_record(event_id = str(id))
@@ -122,7 +123,7 @@ def save_checklist():
 def update_checklist():
     event_id = request.json.get('event_id')
     content = request.json.get('checklist')
-    db(db.checklist.event_id == event_id).update(content = content)
+    db(db.checklist.event_id == event_id).update(content = content, name = request.json.get('name'))
     return dict()
 
 @action('get_checklist', method="POST")
@@ -130,7 +131,8 @@ def update_checklist():
 def get_checklist():
     event_id = request.json.get('event_id')
     checklist = db(db.checklist.event_id == event_id).select().first()
-    return dict(checklist = checklist.content)
+    name = checklist.name
+    return dict(checklist = checklist.content, name = name, date = checklist.created_on, location = checklist.location)
 
 @action('my_callback')
 @action.uses() # Add here things like db, auth, etc.
@@ -142,33 +144,36 @@ def my_callback():
 @action('location',method=['POST','GET'])
 @action.uses('location.html',db,auth,url_signer)
 def location(path=None):
-    return dict(location_data =  URL('get_location_data',signer=url_signer))
+    return dict(location_data = URL('location_data'))
 
-
-@action('get_location_data',method=['GET'])
+@action('location_data',method=['GET','POST'])
 @action.uses(db,auth)
-def location_data():
-    checklist_list = db(db.checklist.user_id == "obs678631").select()
-    #sighting = db(db.sighting).select().as_list()
-    #species = db(db.species).select().as_list()
+def get_location_data():
+    maxLat = request.json.get('maxlat')
+    minLat = request.json.get('minlat')
 
-    combine_table = []
-    for row in checklist_list:
-        event_id = row.event_id
-        sighting_obj = db(db.sighting.event_id == event_id).select().first()
-        if sighting_obj != None:
-            species_tag = sighting_obj.species_id
-            species_obj = db(db.species.id == species_tag).select().first()
-            combine_table.append({
-                "species_name": species_obj.name,
-                "sighting": sighting_obj.number_seen,
-                "content" : row.content,
-                "location" : row.location,
-                "created_on" : row.created_on
+    maxLng = request.json.get('maxlng')
+    minLng = request.json.get('minlng')
 
-            })
+    checklist_row = db(db.checklist).select()
 
-    return dict(data = combine_table)
+    checklist_array = []
+    sighting_array = []
+
+    for r in checklist_row:
+        location = json.loads(r.location)
+        lat = float(location['latitude'])
+        lng = float(location['longitude'])
+        if lat >= minLat and lat <= maxLat and lng >= minLng and lng <= maxLng:
+            sighting_obj = db(db.sighting.event_id == r.event_id).select().first()
+            if sighting_obj != None: 
+                species_obj = db(db.species.id == sighting_obj.species_id).select().first()
+                sighting_obj['species_name'] = species_obj.name
+                sighting_array.append(sighting_obj)
+                checklist_array.append(r)
+
+    return dict(checklist = checklist_array,sighting=sighting_array)
+
 @action('stats/<path:path>',method=['GET','POST'])
 @action('stats',method=['GET','POST'])
 @action.uses('stats.html',db,auth)
@@ -194,3 +199,27 @@ def stats():
 
     return dict(stats=stats_list)
 
+@action('get_species_coordinates', method=["GET"])
+@action.uses(db)
+def get_species_coordinates():
+    species_name = request.params.get('species_name')
+    rows = db((db.sighting.species_id == db.species.id) & 
+              (db.sighting.event_id == db.checklist.event_id) &
+              (db.species.name == species_name)).select(
+                  db.checklist.location
+              )
+    coordinates = [json.loads(row.location) for row in rows]
+    return dict(coordinates=coordinates)
+
+@action('get_species', method='GET')
+@action.uses(db)
+def get_species():
+    species = db(db.species).select().as_list()
+    return dict(species=species)
+
+@action('get_all_species_coordinates', method=["GET"])
+@action.uses(db)
+def get_all_species_coordinates():
+    rows = db(db.checklist).select(db.checklist.location).as_list()
+    coordinates = [json.loads(row['location']) for row in rows]
+    return dict(coordinates=coordinates)
