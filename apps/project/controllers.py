@@ -48,7 +48,9 @@ def index():
 @action('checklist/<checklist_id>')
 @action.uses('checklist.html', db, auth, url_signer)
 def checklist(checklist_id):
-    print(checklist_id)
+    logged_in = "True"
+    if not auth.get_user():
+        logged_in = "False"
     return dict(
         my_callback_url = URL('my_callback', signer=url_signer),
         load_data_url = URL('load_data', signer=url_signer),
@@ -56,6 +58,7 @@ def checklist(checklist_id):
         update_checklist_url = URL('update_checklist', signer=url_signer),
         get_checklist_url = URL('get_checklist', signer=url_signer),
         checklist_id = checklist_id,
+        logged_in = logged_in
     )
     
 @action('my_checklists/<path:path>', method=['POST','GET'])
