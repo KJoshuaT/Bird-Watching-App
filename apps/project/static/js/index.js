@@ -29,7 +29,7 @@ app.data = {
             this.shape = null; // Clear shape information
         },
         initMap: function() {
-            var map = L.map('map').setView([51.505, -0.09], 13);
+            var map = L.map('map').setView([38.5, -98.0], 5);
             L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
@@ -57,7 +57,7 @@ app.data = {
             map.addControl(drawControl);
 
             var heatmap = L.heatLayer([], {
-                radius: 25,  
+                radius: 10,  
                 max: 1.0,  
                 minOpacity: 0.5, 
                 gradient: {1.0: 'blue', 1.0: 'lime', 1.0: 'yellow', 1: 'red'}
@@ -76,9 +76,6 @@ app.data = {
                     latlngs: layer.getLatLngs()
                 };
                 this.shape = shapeData;
-
-                // Log the shape data to the console
-                console.log('Rectangle data:', shapeData);
             });
 
             this.map = map; 
@@ -86,16 +83,19 @@ app.data = {
             this.addSampleHeatData();
         },
         addSampleHeatData: function() {
-            // Add some sample heatmap data points
-            var sampleData = [
-                [51.505, -0.09, 0.5],
-                [51.51, -0.1, 0.6],
-                [51.52, -0.12, 0.4],
-                [51.50, -0.08, 0.8],
-                [51.49, -0.13, 0.7]
-            ];
-            for (var i = 0; i < sampleData.length; i++) {
-                this.heatmap.addLatLng([sampleData[i][0], sampleData[i][1], sampleData[i][2]]);
+            if (!this.searchQuery) {
+                axios.get(get_all_species_coordinates_url)
+                    .then(response => {
+                        if (response.data.error) {
+                            console.error('Error:', response.data.error);
+                        } else {
+                            const coordinates = response.data.coordinates;
+                            this.updateHeatmap(coordinates);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching all species coordinates:', error);
+                    });
             }
         },
         sendShapeDataAndRedirectLocation() {
@@ -117,8 +117,6 @@ app.data = {
             const queryString = queryParams.join('&');
         
             const url = `/project/location?${queryString}`;
-        
-            console.log(queryString);
 
             window.location.href = url;
         },
@@ -141,8 +139,6 @@ app.data = {
             const queryString = queryParams.join('&');
         
             const url = `/project/checklist/new?${queryString}`;
-        
-            console.log(queryString);
 
             window.location.href = url;
         },
@@ -165,8 +161,6 @@ app.data = {
             const queryString = queryParams.join('&');
         
             const url = `/project/stats?${queryString}`;
-        
-            console.log(queryString);
 
             window.location.href = url;
         },
@@ -186,6 +180,34 @@ app.data = {
         selectSpecies(species) {
             this.searchQuery = species.name;
             this.filteredSpecies = [];
+            
+            // Call the fetchSpeciesCoordinates method to fetch coordinates
+            this.fetchSpeciesCoordinates(species.name);
+        },
+        fetchSpeciesCoordinates(speciesName) {
+            axios.get(get_species_coordinates_url, {
+                params: {
+                    species_name: speciesName
+                }
+            })
+            .then(response => {
+                if (response.data.error) {
+                    console.error('Error:', response.data.error);
+                } else {
+                    const coordinates = response.data.coordinates;
+                    this.updateHeatmap(coordinates); // Call a function to update the heatmap
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching species coordinates:', error);
+            });
+        },
+        updateHeatmap(coordinates) {
+            this.heatmap.setLatLngs([]);
+        
+            coordinates.forEach(coord => {
+                this.heatmap.addLatLng([parseFloat(coord.latitude), parseFloat(coord.longitude)]);
+            });
         },
     },
     mounted: function() {

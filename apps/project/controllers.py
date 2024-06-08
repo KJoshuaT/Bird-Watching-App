@@ -44,6 +44,7 @@ def index():
         # COMPLETE: return here any signed URLs you need.
         my_callback_url = URL('my_callback', signer=url_signer),
         get_species_coordinates_url = URL('get_species_coordinates', signer=url_signer),
+        get_all_species_coordinates_url = URL('get_all_species_coordinates', signer=url_signer),
         get_species_url = URL('get_species', signer=url_signer),
     )
 
@@ -208,3 +209,10 @@ def get_species_coordinates():
 def get_species():
     species = db(db.species).select().as_list()
     return dict(species=species)
+
+@action('get_all_species_coordinates', method=["GET"])
+@action.uses(db)
+def get_all_species_coordinates():
+    rows = db(db.checklist).select(db.checklist.location).as_list()
+    coordinates = [json.loads(row['location']) for row in rows]
+    return dict(coordinates=coordinates)
