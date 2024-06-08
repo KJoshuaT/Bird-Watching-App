@@ -65,6 +65,7 @@ def checklist(checklist_id):
 @action.uses('my_checklists.html', db, auth, url_signer)
 def my_checklists(path = None):
     columns = [
+        db.checklist.name,
         db.checklist.event_id,
         db.checklist.created_on
         ]
@@ -86,7 +87,7 @@ def my_checklists(path = None):
                 details=False,
                 editable=False,
                 pre_action_buttons=post_action_buttons,
-                headings = ['Checklist ID', 'Created On']
+                headings = ['Checklist Title', 'Checklist ID', 'Created On']
                 )
     return dict(
             grid = grid,
@@ -106,7 +107,8 @@ def load_data():
 def save_checklist():
     id = db.checklist.insert(
         location = {},
-        content = request.json.get('checklist')
+        content = request.json.get('checklist'),
+        name = request.json.get('name')
     )
     cl = db(db.checklist.id == id).select().first()
     cl.update_record(event_id = str(id))
@@ -117,7 +119,7 @@ def save_checklist():
 def update_checklist():
     event_id = request.json.get('event_id')
     content = request.json.get('checklist')
-    db(db.checklist.event_id == event_id).update(content = content)
+    db(db.checklist.event_id == event_id).update(content = content, name = request.json.get('name'))
     return dict()
 
 @action('get_checklist', method="POST")
@@ -125,7 +127,8 @@ def update_checklist():
 def get_checklist():
     event_id = request.json.get('event_id')
     checklist = db(db.checklist.event_id == event_id).select().first()
-    return dict(checklist = checklist.content)
+    name = checklist.name
+    return dict(checklist = checklist.content, name = name)
 
 @action('my_callback')
 @action.uses() # Add here things like db, auth, etc.
