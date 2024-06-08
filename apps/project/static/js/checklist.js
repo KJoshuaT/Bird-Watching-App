@@ -16,7 +16,7 @@ app.data = {
       itemsPerPage: 16,
       editing: false,
       checklist_id: "new",
-      checklistName: "Checklist Title"
+      checklistName: "Checklist Title",
     };
   },
   computed: {
@@ -50,6 +50,12 @@ app.data = {
     },
     saveChecklist: function () {
       let checklist = {};
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      let coord = {};
+      urlParams.forEach((value, key) => {
+        coord[key] = JSON.parse(value);
+      });
       for (let i = 0; i < this.species.length; i++) {
         let s = this.species[i];
         if (s.count > 0) {
@@ -60,14 +66,15 @@ app.data = {
         axios.post(update_checklist_url, {
           checklist: checklist,
           event_id: this.checklist_id,
-          name: this.checklistName
+          name: this.checklistName,
         })
         alert("Checklist Updated!");
       }
       else{
         axios.post(save_checklist_url, {
           checklist: checklist,
-          name: this.checklistName
+          name: this.checklistName,
+          location: coord
         }).then((response) => {
           console.log(response.data);
         });
@@ -84,9 +91,6 @@ app.load_data = function () {
     alert("You must be logged in to create a checklist");
     window.location.href = "/project/auth/login";
   }
-  axios.get(my_callback_url).then(function (r) {
-    app.vue.my_value = r.data.my_value;
-  });
   axios.get(load_data_url).then((response) => {
     app.vue.species = response.data.species;
     for (let i = 0; i < app.vue.species.length; i++) {
