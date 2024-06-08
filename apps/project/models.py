@@ -31,6 +31,7 @@ db.define_table('checklist',
     Field('created_on', 'datetime', default=get_time),
     Field('user_id', default=get_user_email),
     Field('content', 'json', default={}),
+    Field('name', 'string', default='Untitled Checklist')
 )
 
 # Sightings table

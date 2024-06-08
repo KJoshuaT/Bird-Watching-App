@@ -3,7 +3,16 @@
 <div class="section" id="app" v-cloak>
   <!-- Put here your Vue.js template -->
   <div class= "container">
-    <h1 class="title">New Checklist</h1>
+    <div class="columns">
+    <div class="column is-three-quarters">
+    <input
+      class="input is-primary is-large is-rounded is-hovered"
+      type="text"
+      placeholder="Name your checklist"
+      v-model = "checklistName"
+    />
+    </div>
+    </div>
   <div class="columns mb-4">
       <div class="column is-three-quarters">
         <div class="field">
