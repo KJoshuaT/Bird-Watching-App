@@ -164,10 +164,10 @@ def get_location_data():
         if lat >= minLat and lat <= maxLat and lng >= minLng and lng <= maxLng:
             sighting_obj = db(db.sighting.event_id == r.event_id).select().first()
             if sighting_obj != None: 
-                species_obj = db(db.species.id == sighting_obj.species_id).selec().first()
+                species_obj = db(db.species.id == sighting_obj.species_id).select().first()
                 sighting_obj['species_name'] = species_obj.name
                 sighting_array.append(sighting_obj)
-                return_array.append(r)
+                checklist_array.append(r)
 
     return dict(checklist = checklist_array,sighting=sighting_array)
 
