@@ -57,7 +57,7 @@ app.data = {
             map.addControl(drawControl);
 
             var heatmap = L.heatLayer([], {
-                radius: 10,  
+                radius: 15,  
                 max: 1.0,  
                 minOpacity: 0.5, 
                 gradient: {1.0: 'blue', 1.0: 'lime', 1.0: 'yellow', 1: 'red'}
