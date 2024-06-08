@@ -10,12 +10,18 @@ app.data = {
         return {
           num_checklist: 0,
           total_sighting: 0,
-          datalist: []
+          datalist: [],
+          sightinglist: [],
         };
     },
     methods: {
-      regioncheck : function(bird_location) {
-        return bird_location
+      cal_sighting : function() {
+        let self = this;
+
+        self.sightinglist.forEach(function(s) {
+          self.total_sighting += s.number_seen;
+        })
+
       }
     }
 };
@@ -55,7 +61,16 @@ app.load_data = function () {
   }).then(function(r) {
     let data = r.data;
     app.vue.datalist = data.checklist;
+    app.vue.sightinglist = data.sighting;
     app.vue.num_checklist = data.checklist.length;
+    app.vue.cal_sighting();
+
+    console.log(app.vue.datalist);
+    console.log(app.vue.sightinglist);
+    console.log(app.vue.num_checklist);
+    console.log(app.vue.total_sighting);
+
+
 
   });
 
