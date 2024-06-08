@@ -3,7 +3,7 @@
 <div class="section" id="app" v-cloak>
   <!-- Put here your Vue.js template -->
   <div class= "container">
-    <h1 class="title">Sample Checklist</h1>
+    <h1 class="title">New Checklist</h1>
   <div class="columns mb-4">
       <div class="column is-three-quarters">
         <div class="field">
@@ -68,6 +68,7 @@
   let update_checklist_url = "[[=XML(update_checklist_url)]]";
   let get_checklist_url = "[[=XML(get_checklist_url)]]";
   let checklist_id = "[[=(checklist_id)]]";
+  let logged_in = "[[=(logged_in)]]";
 </script>
 
 <script src="js/checklist.js"></script>

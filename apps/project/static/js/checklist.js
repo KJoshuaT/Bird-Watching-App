@@ -60,6 +60,7 @@ app.data = {
           checklist: checklist,
           event_id: this.checklist_id
         })
+        alert("Checklist Updated!");
       }
       else{
         axios.post(save_checklist_url, {
@@ -67,6 +68,7 @@ app.data = {
         }).then((response) => {
           console.log(response.data);
         });
+        alert("Checklist Saved!");
       }
     },
   }
@@ -75,6 +77,11 @@ app.data = {
 app.vue = Vue.createApp(app.data).mount("#app");
 
 app.load_data = function () {
+  console.log(logged_in);
+  if (logged_in === "False") {
+    alert("You must be logged in to create a checklist");
+    window.location.href = "/project/auth/login";
+  }
   axios.get(my_callback_url).then(function (r) {
     app.vue.my_value = r.data.my_value;
   });

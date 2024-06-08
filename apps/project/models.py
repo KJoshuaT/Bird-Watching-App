@@ -72,7 +72,7 @@ if db(db.sighting).isempty():
         next(csv_reader) # Skip the header
         for row in csv_reader:
             if row[2] == 'X':
-                row[2] = 1
+                row[2] = 0
             db.sighting.insert(
                 event_id=row[0],
                 species_id=names_to_id[row[1]],
