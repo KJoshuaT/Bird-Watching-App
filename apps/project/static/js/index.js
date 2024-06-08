@@ -12,7 +12,10 @@ app.data = {
             drawnItems: null,
             shape: null, // Object to store information about the drawn shape
             heatmap: null, // Heatmap layer
-            heatData: [] // Array to store heatmap data points
+            heatData: [], // Array to store heatmap data points
+            searchQuery: '',
+            speciesList: [],
+            filteredSpecies: [],
         };
     },
     methods: {
@@ -167,10 +170,28 @@ app.data = {
 
             window.location.href = url;
         },
+        fetchSpecies() {
+            axios.get(get_species_url)
+              .then(response => {
+                this.speciesList = response.data.species;
+              })
+              .catch(error => {
+                console.error('Error fetching species:', error);
+              });
+        },
+        filterSpecies() {
+            const query = this.searchQuery.toLowerCase();
+            this.filteredSpecies = this.speciesList.filter(species => species.name.toLowerCase().includes(query));
+        },
+        selectSpecies(species) {
+            this.searchQuery = species.name;
+            this.filteredSpecies = [];
+        },
     },
     mounted: function() {
         // Initialize the map when the component is mounted
         this.initMap();
+        this.fetchSpecies();
     }
 };
 

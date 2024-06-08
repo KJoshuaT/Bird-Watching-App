@@ -42,6 +42,8 @@ def index():
     return dict(
         # COMPLETE: return here any signed URLs you need.
         my_callback_url = URL('my_callback', signer=url_signer),
+        get_species_coordinates_url = URL('get_species_coordinates', signer=url_signer),
+        get_species_url = URL('get_species', signer=url_signer),
     )
 
 @action('checklist/<checklist_id>')
@@ -153,3 +155,21 @@ def species(path=None):
 @action.uses('stats.html',db,auth)
 def stats(path=None):
     return dict()
+
+@action('get_species_coordinates', method=["GET"])
+@action.uses(db)
+def get_species_coordinates():
+    species_name = request.params.get('species_name')
+    rows = db((db.sighting.species_id == db.species.id) & 
+              (db.sighting.event_id == db.checklist.event_id) &
+              (db.species.name == species_name)).select(
+                  db.checklist.location
+              )
+    coordinates = [json.loads(row.location) for row in rows]
+    return dict(coordinates=coordinates)
+
+@action('get_species', method='GET')
+@action.uses(db)
+def get_species():
+    species = db(db.species).select().as_list()
+    return dict(species=species)
