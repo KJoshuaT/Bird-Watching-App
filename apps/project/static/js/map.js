@@ -19,6 +19,7 @@ app.data = {
     methods: {
       cal_sighting : function() {
         let self = this;
+        self.total_sighting = 0;
         self.sightinglist.forEach(function(s) {
           self.total_sighting += s.number_seen;
         })
@@ -95,6 +96,7 @@ app.load_data = function () {
   let maxLng = Math.max(lng1,lng2,lng3,lng4);
   let minLng = Math.min(lng1,lng2,lng3,lng4);
 
+
   axios.post(location_data,{
     maxlat: maxLat,
     minlat: minLat,
@@ -108,11 +110,8 @@ app.load_data = function () {
     app.vue.cal_sighting();
     app.vue.find_top_contributor();
     app.vue.get_species_list();
-    console.log(app.vue.specieslist)
 
   });
-
-
 
 }
 
