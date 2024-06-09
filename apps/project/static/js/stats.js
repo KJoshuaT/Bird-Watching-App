@@ -37,47 +37,48 @@ app.data = {
         visualizeDates: function() {
             // Clear any existing visualization
             d3.select("#visualization").selectAll("*").remove();
-    
+        
             // Create a new visualization
             let svg = d3.select("#visualization")
                         .append("svg")
                         .attr("width", 500)
                         .attr("height", 300);
-    
+        
             let dates = this.speciesDates.map(d => new Date(d.date));
             let counts = this.speciesDates.map(d => d.count);
-    
+        
             let xScale = d3.scaleTime()
                            .domain(d3.extent(dates))
                            .range([50, 450]);
-    
+        
             let yScale = d3.scaleLinear()
                            .domain([0, d3.max(counts)])
                            .range([250, 50]);
-    
+        
             let xAxis = d3.axisBottom(xScale).ticks(5);
-            let yAxis = d3.axisLeft(yScale).ticks(d3.max(counts)).tickFormat(d3.format("d"));
-    
+            // Adjust the number of ticks for the y-axis to avoid overcrowding
+            let yAxis = d3.axisLeft(yScale).ticks(Math.min(d3.max(counts), 10)).tickFormat(d3.format("d"));
+        
             svg.append("g")
                .attr("transform", "translate(0, 250)")
                .call(xAxis);
-    
+        
             svg.append("g")
                .attr("transform", "translate(50, 0)")
                .call(yAxis);
-    
+        
             svg.append("text")
                .attr("transform", "translate(250, 290)")
                .style("text-anchor", "middle")
                .text("Date Seen");
-    
+        
             svg.append("text")
                .attr("transform", "rotate(-90)")
                .attr("y", 15)
                .attr("x", -150)
                .style("text-anchor", "middle")
                .text("Count");
-    
+        
             svg.selectAll("circle")
                .data(this.speciesDates)
                .enter()
