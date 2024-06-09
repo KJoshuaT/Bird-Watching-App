@@ -56,15 +56,46 @@ app.data = {
       },
       get_species_list : function() {
         let self = this;
-        let obj = [];
+        let obj = {};
         self.sightinglist.forEach(function(r) {
-          if (obj !== undefined){
-            obj[r.species_name] = r.number_seen;
+          if (!(r.species_name in obj)){
+            obj[r.species_name] = {count: r.number_seen, event_id: [r.event_id]};
           }else{
-            obj[r.species_name] += r.number_seen;
+            let new_event_id = obj[r.species_name].event_id;
+            new_event_id.push(r.event_id);
+            let new_count = obj[r.species_name].count + r.number_seen;
+            obj[r.species_name] = {count : new_count, event_id: new_event_id};
           }
         })
-        self.specieslist = Object.keys(obj).map(key => ({name: key,count: obj[key]}));
+        self.specieslist = Object.keys(obj).map(key => ({name: key,count: obj[key].count,event_id:obj[key].event_id}));
+        console.log(self.specieslist);
+      },
+      data_viz_setup : function() {
+        let self = this;
+
+        const margin = {top:10,right:30,bottom:30,left:60}
+        let width = 460 - margin.left - margin.right;
+        let height = 400 - margin.top - margin.bottom;
+
+        const svg = d3.select('#region_stat')
+          .append('svg')
+            .attr('width',width)
+            .attr('height',height)
+          .append('g')
+            .style("transform",'translate(${margin.left},${maring.top})');
+        
+
+        const x = d3.scaleTime()
+          .domain(d3.extent())
+
+        const formatdate = d3.timeFormat("%m %Y");
+        const xAxis = d3.axisBottom(x)
+          .tickValues(d3.timeMonth,formatdate);
+
+        svg.append('g')
+          .attr('transform','translate(0,${height})')
+          .call(xAxis)
+        
       }
     }
 };
@@ -120,8 +151,10 @@ app.load_data = function () {
     app.vue.cal_sighting();
     app.vue.find_top_contributor();
     app.vue.get_species_list();
+    //app.vue.data_viz_setup();
 
     console.log(app.vue.datalist);
+    console.log(app.vue.sightinglist);
 
   });
 
