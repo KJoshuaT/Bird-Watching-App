@@ -1,37 +1,55 @@
 "use strict";
 
-// Assuming get_checklist_url is defined somewhere in your HTML or JavaScript
-// For example, in your HTML: <script>let get_checklist_url = "{{=URL('get_checklist', signer=url_signer)}}";</script>
-
+// This will be the object that will contain the Vue attributes
+// and be used to initialize it.
 let app = {};
 
-app.data = function() {
-    return {
-        checklist_items: [], // This will store the checklist items
-    };
-};
-
-app.methods = {
-    fetchChecklist: function(event_id) {
-        // Prepare the request payload
-        const payload = { event_id: event_id };
-        axios.post(get_checklist_url, payload).then((response) => {
-            // Assuming the server responds with a JSON object that has a 'checklist' key
-            this.checklist_items = response.data.checklist;
-        }).catch((error) => {
-            console.error('Error fetching checklist:', error);
-        });
+app.data = {    
+    data: function() {
+        return {
+            user_checklist_list: [],
+            totals: {},
+            species: [],
+            searchQuery: ""
+        };
     },
+    computed: {
+        filteredTotals: function() {
+            let query = this.searchQuery.toLowerCase();
+            return Object.fromEntries(
+                Object.entries(this.totals).filter(([key, value]) => key.toLowerCase().includes(query))
+            );
+        }
+    },
+    methods: {
+        // Complete. 
+    }
 };
 
-app.mounted = function() {
-    // Example: Fetch checklist for a specific event_id when the Vue app is mounted
-    // Replace 'your_event_id_here' with the actual event_id you want to fetch
-    this.fetchChecklist('your_event_id_here');
-};
+app.vue = Vue.createApp(app.data).mount("#app");
 
-app.vue = Vue.createApp({
-    data: app.data,
-    methods: app.methods,
-    mounted: app.mounted,
-}).mount("#app");
+app.load_data = function () {
+    // Complete.
+    axios.get(load_data_url).then(function(r) {
+            // Initialize totals object.
+            let totals = {};
+            let user_checklist_list = r.data.user_checklist_list;
+            // Iterate through each checklist.
+            for (let checklist of user_checklist_list) {
+                // Iterate through each species in the checklist.
+                for (let species in checklist.content) {
+                    if (totals[species]) {
+                        // If species already in totals, add the count.
+                        totals[species] += checklist.content[species];
+                    } else {
+                        // If species not in totals, initialize with the count.
+                        totals[species] = checklist.content[species];
+                    }
+                }
+            }
+            app.vue.totals = totals;
+    });
+}
+
+// Ensure app.vue is initialized before calling load_data
+app.load_data();
