@@ -12,7 +12,8 @@ app.data = {
           total_sighting: 0,
           datalist: [],
           sightinglist: [],
-          top_5: []
+          top_5: [],
+          specieslist: []
         };
     },
     methods: {
@@ -54,7 +55,7 @@ app.data = {
       },
       get_species_list : function() {
         let self = this;
-        let obj = {};
+        let obj = [];
         self.sightinglist.forEach(function(r) {
           if (obj !== undefined){
             obj[r.species_name] = r.number_seen;
@@ -62,7 +63,7 @@ app.data = {
             obj[r.species_name] += r.number_seen;
           }
         })
-        console.log(obj);
+        self.specieslist = Object.keys(obj).map(key => ({name: key,count: obj[key]}));
       }
     }
 };
@@ -106,11 +107,8 @@ app.load_data = function () {
     app.vue.num_checklist = data.checklist.length;
     app.vue.cal_sighting();
     app.vue.find_top_contributor();
-
     app.vue.get_species_list();
-
-
-
+    console.log(app.vue.specieslist)
 
   });
 
