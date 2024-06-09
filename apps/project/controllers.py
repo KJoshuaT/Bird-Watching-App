@@ -63,7 +63,7 @@ def checklist(checklist_id):
         update_checklist_url = URL('update_checklist', signer=url_signer),
         get_checklist_url = URL('get_checklist', signer=url_signer),
         checklist_id = checklist_id,
-        logged_in = logged_in
+        logged_in = logged_in,
     )
     
 @action('my_checklists/<path:path>', method=['POST','GET'])
@@ -73,7 +73,7 @@ def my_checklists(path = None):
     columns = [
         db.checklist.name,
         db.checklist.event_id,
-        db.checklist.created_on
+        db.checklist.created_on,
         ]
     post_action_buttons = [
         lambda row: GridActionButton(
@@ -112,7 +112,7 @@ def load_data():
 @action.uses(db, auth)
 def save_checklist():
     id = db.checklist.insert(
-        location = {},
+        location = request.json.get('location'),
         content = request.json.get('checklist'),
         name = request.json.get('name')
     )
