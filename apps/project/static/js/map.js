@@ -8,6 +8,8 @@ let app = {};
 app.data = {    
     data: function() {
         return {
+          selected: 'None',
+          options: [],
           num_checklist: 0,
           total_sighting: 0,
           datalist: [],
@@ -57,9 +59,11 @@ app.data = {
       get_species_list : function() {
         let self = this;
         let obj = {};
+        let option_list = [];
         self.sightinglist.forEach(function(r) {
           if (!(r.species_name in obj)){
             obj[r.species_name] = {count: r.number_seen, event_id: [r.event_id]};
+            option_list.push(r.species_name);
           }else{
             let new_event_id = obj[r.species_name].event_id;
             new_event_id.push(r.event_id);
@@ -68,6 +72,17 @@ app.data = {
           }
         })
         self.specieslist = Object.keys(obj).map(key => ({name: key,count: obj[key].count,event_id:obj[key].event_id}));
+        
+        option_list.sort();
+        option_list.unshift('None');
+        d3.select('#selectSpecies')
+          .selectAll('myOptions')
+            .data(option_list)
+          .enter()
+            .append('option')
+          .text(function(d) {return d;})
+          .attr('value',function(d) {return d;});
+
         console.log(self.specieslist);
       },
       data_viz_setup : function() {
@@ -77,16 +92,13 @@ app.data = {
         let width = 460 - margin.left - margin.right;
         let height = 400 - margin.top - margin.bottom;
 
-        const svg = d3.select('#region_stat')
+        const svg = d3.select('#data_viz')
           .append('svg')
             .attr('width',width)
             .attr('height',height)
           .append('g')
             .style("transform",'translate(${margin.left},${maring.top})');
         
-
-        const x = d3.scaleTime()
-          .domain(d3.extent())
 
         const formatdate = d3.timeFormat("%m %Y");
         const xAxis = d3.axisBottom(x)
