@@ -71,7 +71,7 @@ app.data = {
 
 app.vue = Vue.createApp(app.data).mount("#app");
 
-app.load_data = function () {
+app.parse_url = function() {
   var url = new URLSearchParams(window.location.search);
   var point1 = JSON.parse(url.get(0));
   var point2 = JSON.parse(url.get(1));
@@ -96,6 +96,16 @@ app.load_data = function () {
   let maxLng = Math.max(lng1,lng2,lng3,lng4);
   let minLng = Math.min(lng1,lng2,lng3,lng4);
 
+  return [maxLat,minLat,maxLng,minLng];
+
+}
+
+app.load_data = function () {
+  let points = app.parse_url();
+  let maxLat = points[0];
+  let minLat = points[1];
+  let maxLng = points[2];
+  let minLng = points[3];
 
   axios.post(location_data,{
     maxlat: maxLat,
@@ -110,6 +120,8 @@ app.load_data = function () {
     app.vue.cal_sighting();
     app.vue.find_top_contributor();
     app.vue.get_species_list();
+
+    console.log(app.vue.datalist);
 
   });
 
