@@ -32,7 +32,7 @@
     </div>
     <div class="checklist">
         <h1>Your Checklist</h1>
-        <div class="card birdlist mt4" v-for="d in datalist" :key="d">
+        <div class="card birdlist mt4">
             <div class="card-content">
                 <div class="media">
                     <div class="media-content">
@@ -45,8 +45,20 @@
             </div>
         </div> 
     </div>
-    <div class="region Stat">
-        
+    <div class="contributor">
+        <h1>Top 5 Region Contributor</h1>
+        <div class="card contribute mt4" v-for="c in top_5" :key="c">
+            <div class="card-content">
+                <div class="media">
+                    <div class="media-content">
+                        <p class="contributor">{{c.user_id}}</p>
+                    </div>
+                    <div class="media-left">
+                        <p class="con_number">{{c.number}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
 </div>

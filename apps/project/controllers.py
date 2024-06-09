@@ -33,13 +33,9 @@ from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma, Column
 from .helpers import GridActionButton
-<<<<<<< HEAD
 from pydal.validators import IS_NOT_EMPTY
 import json
 
-=======
-import json
->>>>>>> refs/remotes/origin/main
 
 url_signer = URLSigner(session)
 
@@ -161,7 +157,7 @@ def get_location_data():
     maxLng = request.json.get('maxlng')
     minLng = request.json.get('minlng')
 
-    checklist_row = db(db.checklist).select()
+    checklist_row = db(db.checklist).select(orderby=db.checklist.user_id)
 
     checklist_array = []
     sighting_array = []
@@ -184,9 +180,6 @@ def get_location_data():
 @action('stats',method=['GET','POST'])
 @action.uses('stats.html',db,auth)
 def stats():
-    
-<<<<<<< HEAD
-=======
     species_sightings = {}
     for row in rows:
         species_name = db(db.species.id == row.species_id).select().first().name
@@ -224,4 +217,3 @@ def get_all_species_coordinates():
     rows = db(db.checklist).select(db.checklist.location).as_list()
     coordinates = [json.loads(row['location']) for row in rows]
     return dict(coordinates=coordinates)
->>>>>>> refs/remotes/origin/main
