@@ -98,6 +98,10 @@ app.data = {
                     });
             }
         },
+        clearSearch: function() {
+            this.searchQuery = '';
+            this.addSampleHeatData(); // Reset the heatmap to show all coordinates
+        },
         sendShapeDataAndRedirectLocation() {
             if (!this.shape) {
                 alert("Select a region on the map");
