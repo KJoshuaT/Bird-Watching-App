@@ -49,6 +49,12 @@ def index():
         get_all_species_coordinates_url = URL('get_all_species_coordinates', signer=url_signer),
         get_species_url = URL('get_species', signer=url_signer),
     )
+@action('stats')
+@action.uses('stats.html', db, auth, url_signer)
+def statistics():
+    return dict(
+        load_data_url = URL('load_data', signer=url_signer),
+    )
 
 @action('checklist/<checklist_id>')
 @action.uses('checklist.html', db, auth, url_signer)
@@ -65,7 +71,9 @@ def checklist(checklist_id):
         checklist_id = checklist_id,
         logged_in = logged_in,
     )
-    
+
+
+
 @action('my_checklists/<path:path>', method=['POST','GET'])
 @action('my_checklists', method=['POST','GET'])
 @action.uses('my_checklists.html', db, auth, url_signer)
@@ -104,9 +112,11 @@ def my_checklists(path = None):
 @action('load_data', method="GET")
 @action.uses(db, auth)
 def load_data():
+    user_email = get_user_email()
     species_list = db(db.species).select().as_list()
+    user_checklist_list = db(db.checklist.user_id == user_email).select().as_list()
     checklist_list = db(db.checklist).select().as_list()
-    return dict(species = species_list, checklists = checklist_list)
+    return dict(species=species_list, user_checklist_list=user_checklist_list, checklists=checklist_list)
 
 @action('save_checklist', method="POST")
 @action.uses(db, auth)
@@ -174,24 +184,7 @@ def get_location_data():
                 sighting_array.append(sighting_obj)
                 checklist_array.append(r)
 
-    return dict(checklist = checklist_array,sighting=sighting_array)
-
-@action('stats/<path:path>',method=['GET','POST'])
-@action('stats',method=['GET','POST'])
-@action.uses('stats.html',db,auth)
-def stats():
-    species_sightings = {}
-    for row in rows:
-        species_name = db(db.species.id == row.species_id).select().first().name
-        if species_name in species_sightings:
-            species_sightings[species_name] += row.number_seen
-        else:
-            species_sightings[species_name] = row.number_seen
-
-    # Convert the dictionary to a list of dictionaries for easier handling in the view
-    stats_list = [{'species_name': k, 'number_seen': v} for k, v in species_sightings.items()]
-
-    return dict(stats=stats_list)
+    return dict(data = combine_table)
 
 @action('get_species_coordinates', method=["GET"])
 @action.uses(db)
@@ -217,3 +210,6 @@ def get_all_species_coordinates():
     rows = db(db.checklist).select(db.checklist.location).as_list()
     coordinates = [json.loads(row['location']) for row in rows]
     return dict(coordinates=coordinates)
+
+
+    
