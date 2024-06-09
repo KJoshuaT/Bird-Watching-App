@@ -25,16 +25,19 @@
             </tr>
         </tbody>
     </table>
+    <!-- Separate box for the graph, only shown if selectedSpecies is not null -->
+    <div v-if="selectedSpecies" class="box has-background-light mt-4">
+        <h3 class="title is-5">Visualization</h3>
+        <div id="visualization"></div>
+    </div>
     <div v-if="selectedSpecies" class="box has-background-info-light">
         <h3 class="title is-4 has-text-info">Dates for {{ selectedSpecies }}</h3>
-        <ul>
-            <li v-for="date in speciesDates" :key="date.date" class="list-item">
-                <strong>Date:</strong> {{ new Date(date.date).toLocaleString() }} <br>
-                <strong>Count:</strong> {{ date.count }} <br>
-                <!--<strong>Location:</strong> {{ date.location }} -->
-            </li>
-        </ul>
-        <div id="visualization" class="mt-4"></div>
+        <div v-for="date in speciesDates" :key="date.date" class="box has-background-light my-2">
+            <p><strong>Date:</strong> {{ new Date(date.date).toLocaleString() }}</p>
+            <p><strong>Count:</strong> {{ date.count }}</p>
+            <!-- Uncomment if location data should be displayed -->
+            <!-- <p><strong>Location:</strong> {{ date.location }}</p> -->
+        </div>
     </div>
 </div>
 
