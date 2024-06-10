@@ -10,8 +10,9 @@ app.data = {
         return {
           selected: 'None',
           options: [],
-          num_checklist: 0,
-          total_sighting: 0,
+          num_checklist: 'loading',
+          total_sighting: 'loading',
+          species_num: 'loading',
           datalist: [],
           sightinglist: [],
           top_5: [],
@@ -75,7 +76,7 @@ app.data = {
           }
         })
         self.specieslist = Object.keys(obj).map(key => ({name: key,count: obj[key].count,data_obj:obj[key].data_obj}));
-
+        self.species_num = self.specieslist.length;
         self.update_select(option_list);
         self.form_data();
       },
@@ -243,6 +244,10 @@ app.parse_url = function() {
   var point3 = JSON.parse(url.get(2));
   var point4 = JSON.parse(url.get(3));
 
+  if(point1 == null || point2 == null || point3 == null || point4 == null) {
+    window.location.href = '/project';
+  }
+
   var lat1 = point1.lat;
   var lng1 = point1.lng;
   
@@ -286,7 +291,6 @@ app.load_data = function () {
     app.vue.find_top_contributor();
     app.vue.get_species_list();
     app.vue.data_viz_setup();
-
   });
 
 }
