@@ -11,7 +11,7 @@
 
 <div class="section" id="app" v-cloak>
     <h1>Region Infomation</h1>
-    <div class="general_infomation">
+    <div id="general_infomation">
         <div class="card species_count">
             <div class="card-content">
                 <div class="card-title">
@@ -37,7 +37,16 @@
             </div>
         </div>
     </div>
-    <div class="checklist">
+    
+    <div id="region_stat">
+        <select id="selectSpecies"></select>
+        <div id="data_viz">
+
+        </div>
+
+    </div>
+
+    <div id="checklist">
         <h1>Your Checklist</h1>
         <div class="card birdlist mt4">
             <div class="card-content">
@@ -52,7 +61,7 @@
             </div>
         </div> 
     </div>
-    <div class="contributor">
+    <div id="contributor">
         <h1>Checklists Leaderboard</h1>
         <div class="card contribute mt4" v-for="c in top_5" :key="c">
             <div class="card-content">

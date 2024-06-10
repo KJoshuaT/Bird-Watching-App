@@ -184,7 +184,7 @@ def get_location_data():
                 sighting_array.append(sighting_obj)
                 checklist_array.append(r)
 
-    return dict(data = combine_table)
+    return dict(checklist = checklist_array, sighting=sighting_array)
 
 @action('get_species_coordinates', method=["GET"])
 @action.uses(db)
