@@ -68,7 +68,6 @@ app.data = {
           let data = {id: r.event_id, number_seen: r.number_seen, created_on: checklist_obj.created_on};
           if (!(r.species_name in obj)){
             obj[r.species_name] = {count: r.number_seen, data_obj: [data]};
-            option_list.push(r.species_name);
           }else{
             let new_data_obj = obj[r.species_name].data_obj;
             new_data_obj.push(data);
@@ -78,19 +77,24 @@ app.data = {
         })
         self.specieslist = Object.keys(obj).map(key => ({name: key,count: obj[key].count,data_obj:obj[key].data_obj}));
         self.species_num = self.specieslist.length;
+        
+        self.specieslist.forEach(function(r) {
+          option_list.push({name:r.name,count:r.count.toString()})
+        })
+
         self.update_select(option_list);
         self.form_data();
       },
       update_select : function(option_list) {
         option_list.sort();
-        option_list.unshift('None');
+        option_list.unshift({name:'None',count: 0});
         d3.select('#selectSpecies')
           .selectAll('myOptions')
             .data(option_list)
           .enter()
             .append('option')
-          .text(function(d) {return d;})
-          .attr('value',function(d) {return d;});
+          .text(function(d) {return d.name + ': ' + d.count;})
+          .attr('value',function(d) {return d.name;});
       },
       form_data : function() {
         let self = this;
