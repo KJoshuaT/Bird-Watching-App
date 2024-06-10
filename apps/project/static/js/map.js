@@ -15,7 +15,8 @@ app.data = {
           datalist: [],
           sightinglist: [],
           top_5: [],
-          specieslist: []
+          specieslist: [],
+          speciesdata: {}
         };
     },
     methods: {
@@ -61,18 +62,24 @@ app.data = {
         let obj = {};
         let option_list = [];
         self.sightinglist.forEach(function(r) {
+          let checklist_obj = self.datalist.find(x => x.event_id === r.event_id);
+          let data = {id: r.event_id, number_seen: r.number_seen, created_on: checklist_obj.created_on};
           if (!(r.species_name in obj)){
-            obj[r.species_name] = {count: r.number_seen, event_id: [r.event_id]};
+            obj[r.species_name] = {count: r.number_seen, data_obj: [data]};
             option_list.push(r.species_name);
           }else{
-            let new_event_id = obj[r.species_name].event_id;
-            new_event_id.push(r.event_id);
+            let new_data_obj = obj[r.species_name].data_obj;
+            new_data_obj.push(data);
             let new_count = obj[r.species_name].count + r.number_seen;
-            obj[r.species_name] = {count : new_count, event_id: new_event_id};
+            obj[r.species_name] = {count : new_count, data_obj: new_data_obj};
           }
         })
-        self.specieslist = Object.keys(obj).map(key => ({name: key,count: obj[key].count,event_id:obj[key].event_id}));
-        
+        self.specieslist = Object.keys(obj).map(key => ({name: key,count: obj[key].count,data_obj:obj[key].data_obj}));
+
+        self.update_select(option_list);
+        self.form_data();
+      },
+      update_select : function(option_list) {
         option_list.sort();
         option_list.unshift('None');
         d3.select('#selectSpecies')
@@ -82,33 +89,95 @@ app.data = {
             .append('option')
           .text(function(d) {return d;})
           .attr('value',function(d) {return d;});
+      },
+      form_data : function() {
+        let self = this;
+        
+        self.specieslist.forEach(function(obj) {
+          let data = []
+          obj.data_obj.forEach(function(d) {
+            let input_obj = {date: d.created_on,value: d.number_seen}
+            data.push(input_obj);
+          })
+          self.speciesdata[obj.name] = data;
+        })
 
-        console.log(self.specieslist);
+
       },
       data_viz_setup : function() {
         let self = this;
 
         const margin = {top:10,right:30,bottom:30,left:60}
-        let width = 460 - margin.left - margin.right;
-        let height = 400 - margin.top - margin.bottom;
+        let width = 700 + margin.left + margin.right;
+        let height = 400 + margin.top + margin.bottom;
 
         const svg = d3.select('#data_viz')
           .append('svg')
             .attr('width',width)
             .attr('height',height)
           .append('g')
-            .style("transform",'translate(${margin.left},${maring.top})');
+            .attr("transform",'translate(60,10)');
         
+        d3.select('#selectSpecies').on('change',function(evemt,d) {
+          const selectedOption = d3.select(this).property("value");
+          self.update_chart(selectedOption,svg,width,height);
+      });
+      },
+      update_chart : function(name, svg,width,height) {
+        let self = this;
 
-        const formatdate = d3.timeFormat("%m %Y");
+        let data = self.speciesdata[name];
+
+        const parsedate = d3.timeParse('%Y-%m-%d %H:%M:%S');
+
+        let data_filter = data.map(({date,value}) => ({date: parsedate(date),value}));
+        
+        const x = d3.scaleTime()
+            .domain(d3.extent(data_filter,d => d.date))
+            .range([0,width-90]);  
+
+
+        const dateFormat = d3.timeFormat('%d %b %H:%M');           
+
         const xAxis = d3.axisBottom(x)
-          .tickValues(d3.timeMonth,formatdate);
+            .tickFormat((d,i) => {
+              const ticks = xAxis.scale().ticks();
+              return dateFormat(d)
+
+            });
 
         svg.append('g')
-          .attr('transform','translate(0,${height})')
-          .call(xAxis)
-        
+          .attr("transform",'translate(0,370)')
+          .call(xAxis);
+
+        let maxValue = 0;
+        data_filter.forEach(function(obj) {
+          if (obj.value > maxValue) {
+            maxValue = obj.value;
+          }
+        })
+
+        const y = d3.scaleLinear()
+            .domain([0,maxValue])
+            .range([height,0]);
+
+        const yAxis = d3.axisLeft(y)
+          .ticks(maxValue);
+
+        svg.append('g')
+          .call(yAxis);
+
+        svg.selectAll('mybar')
+          .data(data_filter)
+          .enter()
+          .append('rect')
+            .attr('x', function(d) {return x(d.date);})
+            .attr('y',function(d) {return y(d.value);})
+            .attr('width',width/data_filter.length)
+            .attr('height',d => height - y(d.value))
+            .attr('fill','#69b3a2')
       }
+      
     }
 };
 
@@ -163,10 +232,7 @@ app.load_data = function () {
     app.vue.cal_sighting();
     app.vue.find_top_contributor();
     app.vue.get_species_list();
-    //app.vue.data_viz_setup();
-
-    console.log(app.vue.datalist);
-    console.log(app.vue.sightinglist);
+    app.vue.data_viz_setup();
 
   });
 
