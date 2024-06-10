@@ -104,8 +104,21 @@ app.data = {
 
 
       },
-      data_viz_setup : function() {
+      data_viz_setup : function() {   
+        let self = this; 
+        d3.select('#selectSpecies').on('change',function() {
+          const selectedOption = d3.select(this).property("value");
+          self.update_chart(selectedOption);
+      });
+      },
+      update_chart : function(name) {
+        if (name !== 'None') {
+          d3.select('#label').remove();
+        }
+
         let self = this;
+
+        d3.select('svg').remove();
 
         const margin = {top:10,right:30,bottom:30,left:60}
         let width = 700 + margin.left + margin.right;
@@ -133,26 +146,12 @@ app.data = {
         const yAxis = svg.append('g')
           .attr('class','myYaxis')
 
-        
-        
-        d3.select('#selectSpecies').on('change',function(evemt,d) {
-          const selectedOption = d3.select(this).property("value");
-          self.update_chart(selectedOption,svg,x,y,xAxis,yAxis);
-      });
-      },
-      update_chart : function(name,svg,x,y,xAxis,yAxis) {
-        if (name !== 'None') {
-          d3.select('#label').remove();
-        }
-
-        let self = this;
-
         let data = self.speciesdata[name];
         const parsedate = d3.timeParse('%Y-%m-%d %H:%M:%S');
         let data_filter = data.map(({date,value}) => ({date: parsedate(date),value}));
         
         //---xAxis
-        const dateFormat = d3.timeFormat('%d %b %H:%M');  
+        const dateFormat = d3.timeFormat('%d %b');  
         x.domain(d3.extent(data_filter,d => d.date))
         xAxis.transition()
           .duration(1000)
@@ -174,17 +173,13 @@ app.data = {
         y.domain([0,maxValue])
         yAxis.transition()
           .duration(1000)
-          .call(d3.axisLeft(y)
-          .ticks(maxValue));
+          .call(d3.axisLeft(y));
         //-- input data
 
-        const j = svg.selectAll('.myLine')
+        svg.selectAll('.myLine')
           .data(data_filter)
-        j
-          .join('line')
-          .attr('class','myLine')
-          .transition()
-          .duration(1000)
+          .enter()
+          .append('line')
             .attr('x1', function(d) {return x(d.date);})
             .attr('x2',function(d) {return x(d.date);})
             .attr('y1',function(d) {return y(d.value);})
@@ -199,8 +194,12 @@ app.data = {
 
         const u = svg.selectAll('circle')
           .data(data_filter)
-        
-        u.join('circle')
+          .enter()
+          .append('circle')
+            .attr('cx',function(d) { return x(d.date);})
+            .attr('cy',function(d) { return y(d.value);})
+            .attr('r','8')
+            .style('fill','#69b3a2')        
           .on('mouseover',function(event,d) {
             console.log(event);
             d3.select(this).transition()
@@ -226,12 +225,6 @@ app.data = {
               .duration('1000')
               .style('opacity',0);
         })
-          .transition()
-          .duration(1000)
-            .attr('cx',function(d) { return x(d.date);})
-            .attr('cy',function(d) { return y(d.value);})
-            .attr('r','8')
-            .style('fill','#69b3a2')
 
       }
       
