@@ -117,38 +117,52 @@ app.data = {
             .attr('height',height)
           .append('g')
             .attr("transform",'translate(60,10)');
+
+        // x-axis
+        const x = d3.scaleTime()
+          .range([0,width-90])
+
+        const xAxis = svg.append('g')
+          .attr('transform', "translate(0,400)")
+          .attr('class','myXaxis');
+
+        // y-axis
+        const y = d3.scaleLinear()
+          .range([height-40,0]);
+
+        const yAxis = svg.append('g')
+          .attr('class','myYaxis')
+
+        
         
         d3.select('#selectSpecies').on('change',function(evemt,d) {
           const selectedOption = d3.select(this).property("value");
-          self.update_chart(selectedOption,svg,width,height);
+          self.update_chart(selectedOption,svg,x,y,xAxis,yAxis);
       });
       },
-      update_chart : function(name, svg,width,height) {
+      update_chart : function(name,svg,x,y,xAxis,yAxis) {
+        if (name !== 'None') {
+          d3.select('#label').remove();
+        }
+
         let self = this;
 
         let data = self.speciesdata[name];
-
         const parsedate = d3.timeParse('%Y-%m-%d %H:%M:%S');
-
         let data_filter = data.map(({date,value}) => ({date: parsedate(date),value}));
         
-        const x = d3.scaleTime()
-            .domain(d3.extent(data_filter,d => d.date))
-            .range([0,width-90]);  
+        //---xAxis
+        const dateFormat = d3.timeFormat('%d %b %H:%M');  
+        x.domain(d3.extent(data_filter,d => d.date))
+        xAxis.transition()
+          .duration(1000)
+          .call(d3.axisBottom(x)
+          .tickFormat((d,i) => {
+            return dateFormat(d)
+          })
+        );      
 
-
-        const dateFormat = d3.timeFormat('%d %b %H:%M');           
-
-        const xAxis = d3.axisBottom(x)
-            .tickFormat((d,i) => {
-              const ticks = xAxis.scale().ticks();
-              return dateFormat(d)
-
-            });
-
-        svg.append('g')
-          .attr("transform",'translate(0,370)')
-          .call(xAxis);
+        //---yAxis
 
         let maxValue = 0;
         data_filter.forEach(function(obj) {
@@ -157,25 +171,69 @@ app.data = {
           }
         })
 
-        const y = d3.scaleLinear()
-            .domain([0,maxValue])
-            .range([height,0]);
+        y.domain([0,maxValue])
+        yAxis.transition()
+          .duration(1000)
+          .call(d3.axisLeft(y)
+          .ticks(maxValue));
+        //-- input data
 
-        const yAxis = d3.axisLeft(y)
-          .ticks(maxValue);
-
-        svg.append('g')
-          .call(yAxis);
-
-        svg.selectAll('mybar')
+        const j = svg.selectAll('.myLine')
           .data(data_filter)
-          .enter()
-          .append('rect')
-            .attr('x', function(d) {return x(d.date);})
-            .attr('y',function(d) {return y(d.value);})
-            .attr('width',width/data_filter.length)
-            .attr('height',d => height - y(d.value))
-            .attr('fill','#69b3a2')
+        j
+          .join('line')
+          .attr('class','myLine')
+          .transition()
+          .duration(1000)
+            .attr('x1', function(d) {return x(d.date);})
+            .attr('x2',function(d) {return x(d.date);})
+            .attr('y1',function(d) {return y(d.value);})
+            .attr('y2',y(0))
+            .attr("stroke",'grey')
+
+        var div = d3.select('#data_viz')
+            .append('div')
+            .attr('class','tooltip-donut')
+            .attr('id','label')
+            .style("opacity",0)
+
+        const u = svg.selectAll('circle')
+          .data(data_filter)
+
+        u.on('mouseover',function(event,d) {
+            console.log(event);
+            d3.select(this).transition()
+              .duration('50')
+              .attr('opacity','.85')
+  
+            div.transition()
+              .duration(50)
+              .style('opacity',1)
+  
+            let info = "Sighted on: " + d.date.toString() + '<br>Number of sighting: ' + d.value.toString();
+            div.html(info)
+              .style('left',(event.pageX + 10) + 'px')
+              .style('top',(event.pageY - 15) + 'px');
+  
+            })
+          .on('mouseout',function(d) {
+            d3.select(this).transition()
+              .duration('1000')
+              .attr('opacity',1)
+  
+            div.transition()
+              .duration('1000')
+              .style('opacity',0);
+        })
+        
+        u.join('circle')
+          .transition()
+          .duration(1000)
+            .attr('cx',function(d) { return x(d.date);})
+            .attr('cy',function(d) { return y(d.value);})
+            .attr('r','4')
+            .style('fill','#69b3a2')
+
       }
       
     }
