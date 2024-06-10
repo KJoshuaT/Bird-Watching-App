@@ -28,7 +28,7 @@ app.data = {
             }
             this.shape = null; // Clear shape information
         },
-        initMap: function() {
+        initMap: function() { // Initializes the map and heat map!!!
             var map = L.map('map').setView([38.5, -98.0], 5);
             L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -102,7 +102,7 @@ app.data = {
             this.searchQuery = '';
             this.addSampleHeatData(); // Reset the heatmap to show all coordinates
         },
-        sendShapeDataAndRedirectLocation() {
+        sendShapeDataAndRedirectLocation() { //redirect for location
             if (!this.shape) {
                 alert("Select a region on the map");
                 return;
@@ -124,7 +124,7 @@ app.data = {
 
             window.location.href = url;
         },
-        sendShapeDataAndRedirectChecklist() {
+        sendShapeDataAndRedirectChecklist() { //redirect for checklist
             if (!this.shape) {
                 alert("Select a region on the map");
                 return;
@@ -146,7 +146,7 @@ app.data = {
 
             window.location.href = url;
         },
-        sendShapeDataAndRedirectStats() {
+        sendShapeDataAndRedirectStats() { //redirect for stats
             if (!this.shape) {
                 alert("Select a region on the map");
                 return;
@@ -177,18 +177,18 @@ app.data = {
                 console.error('Error fetching species:', error);
               });
         },
-        filterSpecies() {
+        filterSpecies() { //searchbar filter
             const query = this.searchQuery.toLowerCase();
             this.filteredSpecies = this.speciesList.filter(species => species.name.toLowerCase().includes(query));
         },
-        selectSpecies(species) {
+        selectSpecies(species) { //searchbar selection
             this.searchQuery = species.name;
             this.filteredSpecies = [];
             
             // Call the fetchSpeciesCoordinates method to fetch coordinates
             this.fetchSpeciesCoordinates(species.name);
         },
-        fetchSpeciesCoordinates(speciesName) {
+        fetchSpeciesCoordinates(speciesName) { //gets the coordinate for a specific species for heatmap
             axios.get(get_species_coordinates_url, {
                 params: {
                     species_name: speciesName
@@ -206,7 +206,7 @@ app.data = {
                 console.error('Error fetching species coordinates:', error);
             });
         },
-        updateHeatmap(coordinates) {
+        updateHeatmap(coordinates) { //updates the heatmap.
             this.heatmap.setLatLngs([]);
         
             coordinates.forEach(coord => {
