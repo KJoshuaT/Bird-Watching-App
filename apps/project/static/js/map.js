@@ -199,39 +199,38 @@ app.data = {
 
         const u = svg.selectAll('circle')
           .data(data_filter)
-
-        u.on('mouseover',function(event,d) {
+        
+        u.join('circle')
+          .on('mouseover',function(event,d) {
             console.log(event);
             d3.select(this).transition()
               .duration('50')
               .attr('opacity','.85')
-  
+
             div.transition()
               .duration(50)
               .style('opacity',1)
-  
+
             let info = "Sighted on: " + d.date.toString() + '<br>Number of sighting: ' + d.value.toString();
             div.html(info)
               .style('left',(event.pageX + 10) + 'px')
               .style('top',(event.pageY - 15) + 'px');
-  
+
             })
           .on('mouseout',function(d) {
             d3.select(this).transition()
               .duration('1000')
               .attr('opacity',1)
-  
+
             div.transition()
               .duration('1000')
               .style('opacity',0);
         })
-        
-        u.join('circle')
           .transition()
           .duration(1000)
             .attr('cx',function(d) { return x(d.date);})
             .attr('cy',function(d) { return y(d.value);})
-            .attr('r','4')
+            .attr('r','8')
             .style('fill','#69b3a2')
 
       }
