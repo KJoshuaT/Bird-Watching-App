@@ -55,11 +55,13 @@
     </div>
     <div class="section" id="region_stat">
         <h1>Species List and Species Sighting Over Time</h1>
-        <select id="selectSpecies"></select>
-        <div id="data_viz"></div>
+            <select id="selectSpecies"></select>
+            <div id="data_viz"></div>
+            <p v-if="!loaded">loading</p>
     </div>
     <div class="section" id="contributor">
         <h1>Checklists Leaderboard</h1>
+        <p v-if="!loaded">loading</p>
         <div class="card contribute mt4" v-for="c in top_5" :key="c">
             <div class="card-content">
                 <div class="media">

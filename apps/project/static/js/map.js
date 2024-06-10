@@ -8,6 +8,7 @@ let app = {};
 app.data = {    
     data: function() {
         return {
+          loaded: false,
           selected: 'None',
           options: [],
           num_checklist: 'loading',
@@ -121,7 +122,7 @@ app.data = {
 
         d3.select('svg').remove();
 
-        const margin = {top:10,right:30,bottom:30,left:60}
+        const margin = {top:10,right:30,bottom:50,left:60}
         let width = 700 + margin.left + margin.right;
         let height = 400 + margin.top + margin.bottom;
 
@@ -142,7 +143,7 @@ app.data = {
 
         // y-axis
         const y = d3.scaleLinear()
-          .range([height-40,0]);
+          .range([height-60,0]);
 
         const yAxis = svg.append('g')
           .attr('class','myYaxis')
@@ -155,15 +156,19 @@ app.data = {
         let xdomain = d3.extent(data_filter,d=>d.date)
         let newEnddate = d3.timeDay.offset(xdomain[1],1)
         let newStartdate = d3.timeDay.offset(xdomain[0],-1)
-        const dateFormat = d3.timeFormat('%d %b');  
+        const dateFormat = d3.timeFormat('%d %b %H:%M');  
         x.domain([newStartdate,newEnddate])
         xAxis.transition()
           .duration(100)
           .call(d3.axisBottom(x)
           .tickFormat((d,i) => {
             return dateFormat(d)
-          })
-        );      
+          }));
+        xAxis.selectAll('text')
+          .attr('dx','-3em')
+          .attr('dy','1em')
+          .attr('transform','rotate(-35)')
+             
 
         //---yAxis
 
@@ -207,7 +212,7 @@ app.data = {
           .on('mouseover',function(event,d) {
             console.log(event);
             d3.select(this).transition()
-              .duration('50')
+              .duration('20')
               .attr('opacity','.85')
 
             div.transition()
@@ -226,7 +231,7 @@ app.data = {
               .attr('opacity',1)
 
             div.transition()
-              .duration('1000')
+              .duration('50')
               .style('opacity',0);
         })
 
@@ -284,6 +289,7 @@ app.load_data = function () {
     minlng: minLng
   }).then(function(r) {
     let data = r.data;
+    app.vue.loaded = true;
     app.vue.datalist = data.checklist;
     app.vue.sightinglist = data.sighting;
     app.vue.num_checklist = data.checklist.length;
