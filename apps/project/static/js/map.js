@@ -151,10 +151,13 @@ app.data = {
         let data_filter = data.map(({date,value}) => ({date: parsedate(date),value}));
         
         //---xAxis
+        let xdomain = d3.extent(data_filter,d=>d.date)
+        let newEnddate = d3.timeDay.offset(xdomain[1],1)
+        let newStartdate = d3.timeDay.offset(xdomain[0],-1)
         const dateFormat = d3.timeFormat('%d %b');  
-        x.domain(d3.extent(data_filter,d => d.date))
+        x.domain([newStartdate,newEnddate])
         xAxis.transition()
-          .duration(1000)
+          .duration(100)
           .call(d3.axisBottom(x)
           .tickFormat((d,i) => {
             return dateFormat(d)

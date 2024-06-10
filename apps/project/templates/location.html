@@ -54,11 +54,9 @@
         </div>
     </div>
     <div class="section" id="region_stat">
+        <h1>Species List and Species Sighting Over Time</h1>
         <select id="selectSpecies"></select>
-        <div id="data_viz">
-
-        </div>
-
+        <div id="data_viz"></div>
     </div>
     <div class="section" id="contributor">
         <h1>Checklists Leaderboard</h1>
@@ -66,7 +64,7 @@
             <div class="card-content">
                 <div class="media">
                     <div class="media-content">
-                        <p class="contributor">{{c.user_id}}</p>
+                        <p class="contributor">User: {{c.user_id}}</p>
                     </div>
                     <div class="media-left">
                         <p class="con_number">{{c.number}} checklists</p>
