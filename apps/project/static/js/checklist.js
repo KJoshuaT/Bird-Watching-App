@@ -71,10 +71,14 @@ app.data = {
         alert("Checklist Updated!");
       }
       else{
+        let loc = {
+          'latitude': coord[0]["lat"].toString(),
+          'longitude': coord[0]["lng"].toString()
+        };
         axios.post(save_checklist_url, {
           checklist: checklist,
           name: this.checklistName,
-          location: coord
+          location: JSON.stringify(loc)
         }).then((response) => {
           console.log(response.data);
         });
@@ -103,6 +107,10 @@ app.load_data = function () {
       axios.post(get_checklist_url, {
         event_id: checklist_id
       }).then((response) => {
+        if (response.data.same_user === "False") {
+          alert("Hey edit your own checklist not someone else's!");
+          window.location.href = "/project/index";
+        }
         app.vue.checklistName = response.data.name;
         let content = response.data.checklist;
         for (let key in content) {

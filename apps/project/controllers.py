@@ -141,10 +141,13 @@ def update_checklist():
 @action('get_checklist', method="POST")
 @action.uses(db, auth)
 def get_checklist():
+    same_user = "True"
     event_id = request.json.get('event_id')
     checklist = db(db.checklist.event_id == event_id).select().first()
+    if get_user_email() != checklist.user_id:
+        same_user = "False"
     name = checklist.name
-    return dict(checklist = checklist.content, name = name, date = checklist.created_on, location = checklist.location)
+    return dict(checklist = checklist.content, name = name, date = checklist.created_on, location = checklist.location, same_user = same_user)
 
 @action('my_callback')
 @action.uses() # Add here things like db, auth, etc.
